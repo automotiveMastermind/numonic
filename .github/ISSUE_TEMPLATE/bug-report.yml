@@ -7,7 +7,7 @@ assignees:
 body:
   - type: markdown
     attributes:
-      value: |
+      value: >
         Thank you for using numonic. We appreciate you taking the time to provide feedback!  Providing as much detail
         as possible will help us triage the issue quickly and efficiently.
 
@@ -15,14 +15,9 @@ body:
     id: bug-reproduce
     attributes:
       label: Commands to Reproduce
-      description: |
+      description: >
         Please provide the commands used to reproduce the bug.  This will be automatically formatted so no need to
         include backticks.
-      placeholder: |
-        1.
-        2.
-        3.
-        ...
       render: sh
     validations:
       required: true
@@ -49,17 +44,18 @@ body:
     id: logs
     attributes:
       label: Any additional logs that will help us?
-      description: |
+      description: >
         Please copy and paste any relevant logs. This will be automatically formatted so no need to include backticks.
       render: sh
     validations:
       required: false
 
-  - type: checkboxes
+  - type: dropdown
     id: os-names
     attributes:
       label: Operating System(s)
       description: What is/are the operating system(s) where the bug is known to occur?
+      multiple: true
       options:
         - macOS
         - Ubuntu
@@ -77,25 +73,28 @@ body:
     attributes:
       label: Operating System (Other)
       description: If you chose `other` above, please let us know what other OSs you are using.
+      placeholder: Operating System
     validations:
       required: false
 
-  - type: checkboxes
+  - type: dropdown
     id: os-architecture
     attributes:
       label: Architecture
       description: What is/are the architecture(s) where the bug is known to occur?
+      multiple: true
       options:
         - arm64 / aarch64
         - amd64 / x86_64
     validations:
       required: true
 
-  - type: checkboxes
+  - type: dropdown
     id: term-shell
     attributes:
       label: Shell
       description: What is/are the shell(s) where the bug is known to occur?
+      multiple: true
       options:
         - zsh
         - bash
@@ -104,11 +103,12 @@ body:
     validations:
       required: true
 
-  - type: checkboxes
+  - type: dropdown
     id: term-names
     attributes:
       label: Terminal Program(s)
       description: What is/are the name(s) of the terminal program(s) you are using or would like to use with numonic?
+      multiple: true
       options:
         - apple
         - gnome
@@ -122,6 +122,7 @@ body:
     attributes:
       label: Terminal Program(s) (Other)
       description: If you chose `other` above, please let us know what other terminal programs you are using.
+      placeholder: Terminal Program
     validations:
       required: false
 
@@ -129,8 +130,10 @@ body:
     id: os-uname
     attributes:
       label: What is the output from `uname -srv` on the system(s) where the bug is occurring?
-      description: |
-        Please copy and paste the output from `uname -srv`
+      description: Please copy and paste the output from `uname -srv`
+      placeholder: >
+        Darwin 21.1.0 Darwin Kernel Version 21.1.0: Wed Oct 13 17:33:01 PDT 2021;
+        root:xnu-8019.41.5~1/RELEASE_ARM64_T6000
     validations:
       required: false
 
@@ -138,7 +141,7 @@ body:
     id: code-of-conduct
     attributes:
       label: Code of Conduct
-      description: |
+      description: >
         By submitting this issue, you agree to follow our
         [Code of Conduct](https://automotivemastermind.io/governance/code-of-conduct)
       options:
