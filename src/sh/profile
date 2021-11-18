@@ -1,0 +1,91 @@
+#! /usr/bin/env sh
+
+export NUMONIC_LOCAL="${NUMONIC_LOCAL:-"${HOME}/.local"}"
+export NUMONIC_HOME="${NUMONIC_HOME:-"${NUMONIC_LOCAL}/numonic"}"
+export NUMONIC_SHARE="${NUMONIC_SHARE:-"${NUMONIC_LOCAL}/share"}"
+export NUMONIC_BIN="${NUMONIC_BIN:-"${NUMONIC_LOCAL}/bin"}"
+
+if [ -t 1 ]; then
+	# enable colors for various commands
+	export TERM=xterm-256color
+	export GREP_COLOR='1;32'
+	export CLICOLOR=1
+	alias grep="grep --color=auto"
+
+	# change ls colors to be more like original unix/linux
+	export LSCOLORS="ExGxBxDxCxEgEdxbxgxcxd"
+fi
+
+# use code as the default editor
+if command -v code 1>/dev/null 2>&1; then
+	export EDITOR=code-wait
+fi
+
+if command -v /opt/homebrew/bin/brew 1>/dev/null 2>&1; then
+	eval "$(/opt/homebrew/bin/brew shellenv)"
+elif command -v brew 1>/dev/null 2>&1; then
+	eval "$(brew shellenv)"
+else
+	if [ -d "${LOCALAPPDATA}"/git ]; then
+		LOCAL_PREFIX=$(printf "%s" "/${LOCALAPPDATA}/git" | sed -e 's/\\/\//g' -e 's/://')
+	elif [ -d /usr/local ]; then
+		LOCAL_PREFIX=/usr/local
+	else
+		LOCAL_PREFIX="${NUMONIC_LOCAL}"
+	fi
+	export LOCAL_PREFIX
+
+	if [ -d "${LOCAL_PREFIX}"/bin ]; then
+		export PATH="${LOCAL_PREFIX}/bin:${PATH}"
+	fi
+fi
+
+# prepend the prompt bin to the path
+if [ -d "${NUMONIC_BIN}" ] && [ "${PATH#*"${NUMONIC_BIN}"}" = "${PATH}" ]; then
+	export PATH="${NUMONIC_BIN}:${PATH}"
+fi
+
+# set the completion dirs
+export BASH_COMPLETION_DIR="${NUMONIC_SHARE}/bash-completions/completions"
+export ZSH_COMPLETION_DIR="${NUMONIC_SHARE}/zsh-completions/completions"
+
+sh_scripts_dir="${NUMONIC_HOME}/sh/scripts"
+
+# add scripts to path
+if [ "${PATH#*"${sh_scripts_dir}"}" = "${PATH}" ]; then
+	export PATH="${sh_scripts_dir}:${PATH}"
+fi
+
+# evaluate eval scripts
+for eval_script in "${NUMONIC_HOME}"/sh/scripts/eval/*; do
+	if [ ! -f "${eval_script}" ]; then
+		break
+	fi
+
+	. "${eval_script}"
+done
+
+# aliases
+# -- prompt for overwrites
+alias cp='cp -i'
+alias mv='mv -i'
+alias rm='rm -i'
+
+# -- windows style shortcuts
+alias cd..='cd ..'
+alias ..='cd ..'
+alias ...='cd .. ; ..'
+alias cls='clear'
+alias rd='rm -ir'
+
+# -- sudo alias (allow other alias extensions to work when sudo-ing)
+alias sudo='sudo '
+
+# list aliases
+alias ll='ls -lh'
+alias la='ls -la'
+alias lla='ls -lha'
+alias lsp='ls -p'
+
+# load the env (to include user vars)
+userenv load

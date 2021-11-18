@@ -1,0 +1,141 @@
+#! /usr/bin/env sh
+
+set -e
+
+__numonic_github_release() {
+	org=
+	repo=
+	pre=
+	filter=
+
+	while :; do
+		case $1 in
+			--help)
+				man github-release
+				return 0
+				;;
+			-dr|--dry-run)
+				dry_run=1
+				;;
+			--debug)
+				debug=1
+				;;
+			-o|--org|--organization|--organisation)
+				org="${2}"
+				shift
+				;;
+			--org=*|--organization=*|--organisation=*)
+				org="${1#*=}"
+				;;
+			-r|--repo|--repository)
+				repo="${2}"
+				shift
+				;;
+			--repo=*|--repository=*)
+				repo="${1#*=}"
+				;;
+			-p|--pre|--prerelease)
+				pre="${2}"
+				shift
+				;;
+			--pre=*|--prerelease=*)
+				pre="${1#*=}"
+				;;
+			-f|--filter)
+				filter="${2}"
+				shift
+				;;
+			--filter=*)
+				filter="${1#*=}"
+				;;
+			?*)
+				if [ -z "${org:-}" ]; then
+					org="${1}"
+				elif [ -z "${repo:-}" ]; then
+					repo="${1}"
+				elif [ -z "${pre:-}" ]; then
+					pre="${1}"
+				elif [ -z "${filter:-}" ]; then
+					filter="${1}"
+				else
+					print-fail "git github-release: too many arguments, argument: ${1} is unexpected"
+					man github-release | cat 1>&2
+				fi
+				;;
+			*)
+				break
+				;;
+		esac
+		shift
+	done
+
+	if [ -n "${dry_run:-}" ]; then
+		print-warn '' \
+			'GITHUB RELEASE' \
+			"org        : ${org}" \
+			"repo       : ${repo}" \
+			"prerelease : ${pre}" \
+			"filter : ${filter}" \
+		''
+
+		return 0
+	fi
+
+	(
+		if [ -n "${debug:-}" ]; then
+			set -x
+		fi
+
+		if [ -f "/run/secrets/GITHUB_TOKEN" ]; then
+			GITHUB_TOKEN=$(cat /run/secrets/GITHUB_TOKEN)
+		fi
+
+		if [ -n "${NUMONIC_TOKEN:-}" ]; then
+			set -- --header "'Authorization: token ${NUMONIC_TOKEN}'"
+		elif [ -n "${GITHUB_TOKEN:-}" ]; then
+			set -- --header "'Authorization: token ${GITHUB_TOKEN}'"
+		fi
+
+		if [ "${pre:-}" = "--pre" ]; then
+			filter=${filter:-'.[0].tag_name'}
+			set -- "$@" --ipv4 --silent --location "https://api.github.com/repos/${org}/${repo}/releases"
+			set -- "$@" "https://api.github.com/repos/${org}/${repo}/releases?page=2"
+			set -- "$@" "https://api.github.com/repos/${org}/${repo}/releases?page=3"
+			curl "$@" | jq -r '.[]' | jq -s | jq -r "$filter"
+		elif [ "${pre:-}" = "--tags" ]; then
+			filter=${filter:-'.[0]'}
+			set -- "$@" --ipv4 --silent --location "https://api.github.com/repos/${org}/${repo}/tags"
+			set -- "$@" "https://api.github.com/repos/${org}/${repo}/tags?page=2"
+			set -- "$@" "https://api.github.com/repos/${org}/${repo}/tags?page=3"
+			curl "$@" \
+				| jq '.[]' \
+				| jq -s \
+				| jq --arg org "${org}" --arg repo "${repo}" \
+					'[.[].name
+						| select(contains("."))
+						| sub($org;"") | sub($repo;"")
+						| sub(".*/";"")
+						| ltrimstr("-") | rtrimstr("-")
+						| ltrimstr("v")
+						| select(contains("-") or contains("a") or contains("b") or contains("rc") | not)
+					]' \
+				| jq -r "${filter}"
+		else
+			index=${filter:-0}
+			set -- "$@" --ipv4 --silent --location https://api.github.com/repos/"${org}"/"${repo}"/releases
+			curl "$@" \
+				| jq --arg org "${org}" --arg repo "${repo}" \
+					'[.[].tag_name
+						| select(contains("."))
+						| sub($org;"") | sub($repo;"")
+						| sub(".*/";"")
+						| ltrimstr("-") | rtrimstr("-")
+						| ltrimstr("v")
+						| select(. | contains("-") or contains("a") or contains("b") or contains("rc") | not)
+					]' \
+				| jq -r --arg index "${index}" '.[$index | tonumber]'
+		fi
+	)
+}
+
+__numonic_github_release "$@"

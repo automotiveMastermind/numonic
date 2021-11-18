@@ -1,0 +1,48 @@
+#! /usr/bin/env sh
+
+set -e
+
+__numonic_install_podman() {
+
+	NAME=$(. /etc/os-release && printf '%s' "${NAME}")
+	VERSION_ID=$(. /etc/os-release && printf '%s' "${VERSION_ID}")
+
+	key=$(mktemp)
+
+	printf 'deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/x%s_%s/ /' "${NAME}" "${VERSION_ID}" \
+		| sudo tee /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list 1>/dev/null 2>&1
+
+	printf 'deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/testing/x%s_%s/ /' "${NAME}" "${VERSION_ID}" \
+		| sudo tee /etc/apt/sources.list.d/devel:kubic:libcontainers:testing.list 1>/dev/null 2>&1
+
+	download-safe \
+		"https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/x${NAME}_${VERSION_ID}/Release.key" \
+		"${key}"
+	sudo apt-key add "${key}"
+
+	download-safe \
+		"https://download.opensuse.org/repositories/devel:kubic:libcontainers:testing/x${NAME}_${VERSION_ID}/Release.key" \
+		"${key}"
+	sudo apt-key add "${key}"
+
+	print-success 'installing podman, buildah, and skopeo...'
+	sudo apt update --yes
+	sudo apt install --yes podman buildah skopeo slirp4netns
+
+	if [ ! -d "/etc/containers" ]; then
+		sudo mkdir -p "/etc/containers"
+	fi
+
+	XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-${HOME}/.config}
+	CONTAINERS_HOME=${XDG_CONFIG_HOME}/containers
+
+	if [ ! -d "${CONTAINERS_HOME}" ]; then
+		sudo mkdir -p "${CONTAINERS_HOME}"
+	fi
+
+	if command -v configure-podman 1>/dev/null 2>&1; then
+		configure-podman
+	fi
+}
+
+__numonic_install_podman

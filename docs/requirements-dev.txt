@@ -1,0 +1,6 @@
+mkdocs-material
+git+https://github.com/jimporter/mike.git
+mkdocs-git-revision-date-localized-plugin
+mkdocs-minify-plugin
+mkdocs-awesome-pages-plugin
+plantuml-markdown

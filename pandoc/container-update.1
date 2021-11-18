@@ -1,0 +1,69 @@
+---
+title: container-update
+man_title: CONTAINER-UPDATE
+man_section: 1
+man_header: Numonic Manual
+man_footer: Numonic v8.1.0
+revision_date: November 10, 2021
+hyphenate: false
+authors:
+  - Deavon M. McCaffery
+---
+
+---
+title: container-update
+---
+
+# NAME
+
+container-update - pulls the latest image layer or manifest for each tag that is locally cached within both podman and
+docker
+
+# SYNOPSIS
+
+**container-update** [**-d** | **--debug**] [**-h** | **--help**] [**-q** | **--quiet**]
+
+# DESCRIPTION
+
+This command pulls the latest image layer or manifest for each tag that is locally cached within both podman and docker.
+At least one of these must be available on the **PATH** or the command will fail. If both are on the **PATH**, then both
+will be updated. This is primarily useful for images are up to date locally when referencing vanity tags.
+
+The command essentially performs the following:
+
+\<command\> images --filter dangling=false --format \\
+ '{{.Repository}}:{{Tag}} | xargs -L1 \<command\> pull
+
+# OPTIONS
+
+## FLAGS
+
+### -d, --debug
+
+print the commands as they are executed (set -x)
+
+### -h, --help
+
+print this help information
+
+### -q, --quiet
+
+suppress any output to stdout (any errors will still be printed)
+
+# EXAMPLES
+
+## container-update
+
+pull the latest image layer or manifest for each tag that is locally cached within both podman and docker
+
+## container-update -d
+
+## container-update --debug
+
+pull the latest image layer or manifest for each tag that is locally cached within both podman and docker while printing
+the commands as they are executed
+
+# SEE ALSO
+
+[**podman-images**(1)](https://docs.podman.io/en/latest/markdown/podman-images.1.html),
+[**podman-pull**(1)](https://docs.podman.io/en/latest/markdown/podman-pull.1.html)

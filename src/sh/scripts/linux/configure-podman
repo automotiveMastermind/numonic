@@ -1,0 +1,66 @@
+#! /usr/bin/env sh
+
+set -e
+
+__numonic_configure_podman() {
+	if [ -n "${NUMONIC_CONTAINER:-}" ]; then
+		print-success "configure-podman: setup podman in container support..."
+
+		sudo tee /etc/containers/containers.conf 1>/dev/null 2>&1 <<- 'EOT'
+			[containers]
+			netns="host"
+			userns="host"
+			ipcns="host"
+			utsns="host"
+			cgroupns="host"
+			cgroups="disabled"
+			log_driver="k8s-file"
+			[engine]
+			cgroup_manager="cgroupfs"
+			events_logger="file"
+			runtime="crun"
+		EOT
+
+		cat <<- EOT > "/home/numonic/.config/containers/containers.cfg"
+			[containers]
+			volumes=["/proc:/proc"]
+		EOT
+
+		# use fuse-overlay
+		sudo sed -i \
+			-e 's|^#mount_program|mount_program|g' \
+			-e '/additionalimage.*/a "/var/lib/shared",' \
+			-e 's|^mountopt[[:space:]]*=.*$|mountopt = "nodev,fsync=0"|g' \
+			/etc/containers/storage.conf
+
+		# create image and layer cache locations
+		sudo mkdir -p \
+			/var/lib/shared/overlay-images \
+			/var/lib/shared/overlay-layers \
+			/var/lib/shared/vfs-images \
+			/var/lib/shared/vfs-layers
+
+		sudo touch /var/lib/shared/overlay-layers/layers.lock
+		sudo touch /var/lib/shared/overlay-images/images.lock
+		sudo touch /var/lib/shared/vfs-images/images.lock
+		sudo touch /var/lib/shared/vfs-layers/layers.lock
+	fi
+
+	if ! command -v docker 1>/dev/null 2>&1; then
+		print-success "configure-podman: adding symlink for docker -> podman..."
+		podman_path=$(command -v podman)
+
+		ln -fs "${podman_path}" "${NUMONIC_BIN}/docker"
+	fi
+
+	# setup qemu user static for multi-arch builds
+	print-success "configure-podman: setting up multi-arch builds (qemu-user-static + binfmt)..."
+	podman run --rm --privileged aptman/qus -- --clear || true
+	podman run --rm --privileged aptman/qus --static -- --persistent --credential || true
+
+	print-success "configure-podman: setup bash and zsh completion..."
+	podman completion bash > "${BASH_COMPLETION_DIR}"/podman.inc
+	podman completion zsh > "${ZSH_COMPLETION_DIR}"/_podman
+}
+
+__numonic_configure_podman "$@"

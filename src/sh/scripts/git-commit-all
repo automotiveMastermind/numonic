@@ -1,0 +1,36 @@
+#! /usr/bin/env sh
+
+set -e
+
+__numonic_git_commit_all() {
+	while :; do
+		case $1 in
+			-d|--debug)
+				debug=1
+				;;
+			-h|--help)
+				man git-commit-all
+				return 0
+				;;
+			*?)
+				print-fail "git commit-all: unknown argument ${1}"
+				man git-commit-all | cat 1>&2
+				return 1
+				;;
+			*)
+				break;
+		esac
+		shift
+	done
+
+	(
+		if [ -n "${debug:-}" ]; then
+			set -x
+		fi
+
+		git add --all
+		git commit --edit
+	)
+}
+
+__numonic_git_commit_all "$@"

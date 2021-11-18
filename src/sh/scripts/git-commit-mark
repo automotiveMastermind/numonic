@@ -1,0 +1,48 @@
+#! /usr/bin/env sh
+
+set -e
+
+__numonic_git_commit_mark() {
+	message="[MARK]"
+
+	while :; do
+		case $1 in
+			-d|--debug)
+				debug=1
+				;;
+			-h|--help)
+				man git-commit-mark
+				return 0
+				;;
+			-m|--message)
+				message="[MARK] ${2}"
+				shift
+				;;
+			--message=*)
+				message="[MARK] ${1#*=}"
+				;;
+			*?)
+				if [ "${message}" = "[MARK]" ]; then
+					message="[MARK] ${1}"
+				else
+					print-fail "git commit-mark: too many arguments, argument: ${1} is unexpected"
+					man git-commit-mark | cat 1>&2
+					return 1
+				fi
+				;;
+			*)
+				break;
+		esac
+		shift
+	done
+
+	(
+		if [ -n "${debug:-}" ]; then
+			set -x
+		fi
+
+		git commit --allow-empty --message "${message}"
+	)
+}
+
+__numonic_git_commit_mark "$@"

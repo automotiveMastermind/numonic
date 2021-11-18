@@ -1,0 +1,115 @@
+#! /usr/bin/env sh
+
+set -e
+
+__numonic_install_podman() {
+
+	while :; do
+		case $1 in
+			-d|--debug)
+				debug=1
+				;;
+			-f|--force)
+				force=1
+				;;
+			-h|--help)
+				man install-podman
+				return 0
+				;;
+			-q|--quiet)
+				quiet=1
+				;;
+			?*)
+				print-fail "install-podman: too many arguments, argument: ${1} is unexpected"
+				man install-podman | cat 1>&2
+				return 1
+				;;
+			*)
+				break
+				;;
+		esac
+		shift
+	done
+
+	if [ -z "${force:-}" ] && command -v podman 1>/dev/null 2>&1; then
+		print-warn "install-podman: podman is already on the path at: $(command -v podman)" \
+			'to reinstall, use the --force flag'
+		man install-podman | cat 1>&2
+		return 1
+	fi
+
+	(
+		if [ -n "${debug:-}" ]; then
+			set -x
+		fi
+
+		if [ -n "${quiet:-}" ]; then
+			exec 1>/dev/null
+		fi
+
+		brews='qemu lima podman skopeo'
+
+		brew update
+
+		for pkg in ${brews}; do
+			if brew list --versions "${pkg}" 1>/dev/null; then
+				print-success "install-podman: upgrading ${pkg}..."
+				brew upgrade "${pkg}" 2>/dev/null
+				brew link --overwrite "${pkg}" 2>/dev/null
+			else
+				print-success "install-podman: installing ${pkg}..."
+				brew install "${pkg}"
+			fi
+		done
+
+		if [ ! -d "${HOME}"/.lima ]; then
+			mkdir -p "${HOME}"/.lima
+		fi
+
+		if limactl list 2>&1 | grep podman 1>/dev/null 2>&1; then
+			print-success 'install-podman: stoping existing lima guest...'
+			limactl stop podman --force
+			limactl delete podman --force
+		fi
+
+		print-success 'install-podman: installing / updating lima guest...'
+		limactl prune 1>/dev/null 2>&1 || true
+
+		# shellcheck disable=SC2016
+		print-warn '' \
+			'install-podman: you will be prompted to modify the configuration -- we recommend verifying the cpu and' \ 'memory limits with at least 1GiB of memory per cpu.' \
+			'' \
+			'By default, only $HOME and /tmp/lima is bind mountable. The $HOME path is configured to be read-only.'
+
+		limactl start "${NUMONIC_HOME}"/sh/scripts/darwin/lima/podman.yaml
+
+		if podman system connection list | grep numonic-root 1>/dev/null 2>&1; then
+			print-success 'install-podman: removing existing numonic-root connection...'
+			podman system connection remove numonic-root
+		fi
+
+		if podman system connection list | grep numonic 1>/dev/null 2>&1; then
+			print-success 'install-podman: removing existing numonic connection...'
+			podman system connection remove numonic
+		fi
+
+		podman system connection add numonic unix://"${HOME}"/.lima/podman/user.sock
+		podman system connection add numonic-root unix://"${HOME}"/.lima/podman/root.sock
+		podman system connection default numonic
+
+		if ! command -v docker 1>/dev/null 2>&1; then
+			print-success 'install-podman: symlink docker to podman...'
+			ln -fs "$(command -v podman)" "${NUMONIC_BIN}"/docker
+		fi
+
+		print-success '' 'install-podman: podman is now ready.'
+
+		# shellcheck disable=SC2016
+		print-warn '' \
+			'install-podman: start a new shell to enable tab completion' \
+			'exec $SHELL -l' \
+		''
+	)
+}
+
+__numonic_install_podman "$@"

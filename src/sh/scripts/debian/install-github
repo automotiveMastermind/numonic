@@ -1,0 +1,25 @@
+#! /usr/bin/env sh
+
+set -e
+
+__numonic_install_github() {
+	if command -v gh 1>/dev/null 2>&1; then
+		return
+	fi
+
+	key=$(mktemp)
+	download-safe \
+		"https://cli.github.com/packages/githubcli-archive-keyring.gpg" \
+		"${key}"
+
+	sudo gpg --dearmor --output /usr/share/keyrings/githubcli-archive-keyring.gpg "${key}"
+
+	printf "deb [arch=%s signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main\n" "$(dpkg --print-architecture)" \
+		| sudo tee /etc/apt/sources.list.d/github-cli.list 1>/dev/null 2>&1
+
+	print-success 'installing github cli...'
+	sudo apt update --yes
+	sudo apt install --yes gh
+}
+
+__numonic_install_github

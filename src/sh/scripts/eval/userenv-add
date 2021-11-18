@@ -1,0 +1,92 @@
+#! /usr/bin/env sh
+
+__numonic_userenv_add() {
+	__userenv_file="${HOME}"/.pam_environment
+	__userenv_name=
+	__userenv_value=
+
+	while :; do
+		case $1 in
+			-h|--help)
+				man userenv-add
+				return 0
+				;;
+			-dr|--dry-run)
+				dry_run=1
+				;;
+			-f|--file)
+				__userenv_file="${2}"
+				shift
+				;;
+			--file=*)
+				__userenv_file="${1#*=}"
+				;;
+			*=*)
+				__userenv_name="${1%%=*}"
+				__userenv_value="${1#*=}"
+				;;
+			*?)
+				if [ -z "${__userenv_name:-}" ]; then
+					__userenv_name="${1}"
+				elif [ -z "${__userenv_value:-}" ]; then
+					__userenv_value="${1}"
+				else
+					print-fail "userenv add: too many arguments, argument: ${1} is unexpected"
+					man userenv-add | cat 1>&2
+					return 1
+				fi
+				;;
+			*)
+				break
+				;;
+		esac
+		shift
+	done
+
+	if [ -z "${__userenv_name}" ]; then
+		print-fail 'userenv add: a name must be specified'
+		man userenv-add | cat 1>&2
+		return 1
+	fi
+
+	if [ -z "${__userenv_value}" ]; then
+		print-fail 'userenv add: a value must be specified'
+		man userenv-add | cat 1>&2
+		return 1
+	fi
+
+	if [ ! -f "${__userenv_file}" ]; then
+		touch "${__userenv_file}"
+	fi
+
+	if grep "^${__userenv_name}=" "${__userenv_file}" 1>/dev/null 2>&1; then
+		print-fail "userenv add: the variable ${__userenv_name} already exists"
+		print-warn "run \`userenv set\` to overwrite the value even if it already exists"
+		return 1
+	fi
+
+	print-warn "$(cat <<- EOT
+	VARIABLE
+		name  : ${__userenv_name}
+		value : ${__userenv_value}
+		file  : ${__userenv_file}
+	EOT
+	)" 2>&1
+
+	if [ -n "${dry_run:-}" ]; then
+		return 0
+	fi
+
+	temp=$(mktemp)
+
+	if [ ! -f "${__userenv_file}" ]; then
+		touch "${__userenv_file}"
+	fi
+
+	grep -v '^$' "${__userenv_file}" > "${temp}"
+	printf '%s="%s"' "${__userenv_name}" "${__userenv_value}" >> "${temp}"
+	mv -f "${temp}" "${__userenv_file}"
+
+	# ensure the new __userenv_value is available in the current shell
+	eval "$(export "${__userenv_name}"="${__userenv_value}")"
+}

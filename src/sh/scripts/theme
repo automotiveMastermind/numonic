@@ -1,0 +1,73 @@
+#! /usr/bin/env sh
+
+set -e
+
+__numonic_theme() {
+	theme=
+
+	while :; do
+		case $1 in
+			-d|--debug)
+				debug=1
+				;;
+			-h|--help)
+				man theme
+				return 0
+				;;
+			-t|--theme)
+				theme="${2}"
+				shift
+				;;
+			--theme=*)
+				theme="${1#*=}"
+				;;
+			?*)
+				print-fail "theme: too many arguments, argument: ${1} is unexpected"
+				man theme | cat 1>&2
+				return 1
+				;;
+			*)
+				break
+				;;
+		esac
+		shift
+	done
+
+	(
+		if [ -n "${debug:-}" ]; then
+			set -x
+			set --  --debug
+		fi
+
+		if [ -z "${theme:-}" ]; then
+			theme="numonic-dark"
+			set -- "$@" --theme="${theme}"
+		fi
+
+		if [ -n "${GNOME_TERMINAL_SERVICE}" ]; then
+			TERM_PROGRAM="gnome-terminal"
+		fi
+
+		case "${TERM_PROGRAM}" in
+			Apple_Terminal)
+				theme-terminal "$@"
+				return 0
+				;;
+			gnome-terminal)
+				theme-gnome-terminal "$@"
+				return 0
+				;;
+			vscode)
+				theme-vscode "$@"
+				return 0
+				;;
+			?*)
+				print-fail "theme: no theme is available for the current program: ${TERM_PROGRAM}" \
+					"please open an issue at: https://numonic.sh/feature-request/theme to request support"
+				man theme | cat 1>&2
+				return 1
+		esac
+	)
+}
+
+__numonic_theme "$@"

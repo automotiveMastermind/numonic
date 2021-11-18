@@ -1,0 +1,29 @@
+[/]
+audible-bell=false
+background-color='rgb(10,14,20)'
+background-transparency-percent=4
+bold-color='rgb(255,255,255)'
+bold-color-same-as-fg=false
+bold-is-bright=true
+cursor-background-color='rgb(255,255,255)'
+cursor-colors-set=true
+cursor-foreground-color='rgb(0,0,0)'
+cursor-shape='ibeam'
+default-size-columns=120
+default-size-rows=48
+exit-action='hold'
+font='FiraCode Nerd Font Mono weight=453 10'
+foreground-color='rgb(179,177,173)'
+highlight-background-color='rgb(22,31,42)'
+highlight-colors-set=true
+login-shell=true
+palette=['rgb(1,6,14)', 'rgb(234,108,115)', 'rgb(145,179,98)', 'rgb(249,175,79)', 'rgb(83,189,250)', 'rgb(250,233,148)', 'rgb(144,225,198)', 'rgb(199,199,199)', 'rgb(104,104,104)', 'rgb(240,113,120)', 'rgb(194,217,76)', 'rgb(255,180,84)', 'rgb(89,194,255)', 'rgb(255,238,153)', 'rgb(149,230,203)', 'rgb(255,255,255)']
+scroll-on-output=false
+scrollback-lines=100000
+scrollback-unlimited=false
+use-custom-command=false
+use-system-font=false
+use-theme-colors=false
+use-theme-transparency=false
+use-transparent-background=true
+visible-name='numonic-dark'

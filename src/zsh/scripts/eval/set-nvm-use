@@ -1,0 +1,92 @@
+#! /usr/bin/env zsh
+
+# determine if nvm find nvmrc is available
+if ! command -v nvm_find_nvmrc 1>/dev/null 2>&1; then
+	# move on immediately
+	return
+fi
+
+__numonic_nvm_use() {
+	NVMRC_PATH=$(nvm_find_nvmrc)
+	CURRENT_NODE_VERSION=$(nvm version)
+
+	# determine if a path was found
+	if [ -z "${NVMRC_PATH}" ]; then
+
+		# unset the warning
+		unset AUTOSWITCH_NODE_SUPPRESS_WARNING
+
+		# determine if the current version is not the default
+		if [ "${CURRENT_NODE_VERSION}" != $(nvm version default) ]; then
+
+			# use default version or lts version or just ignore
+			nvm use default 2>/dev/null || nvm use --lts 2>/dev/null || \
+				print-warn 'You should set/install a default version of node using: `nvm install default --lts` or similar.'
+		fi
+
+		# move on immediately
+		return
+	fi
+
+	# read the nvmrc file to get the version
+	REQUESTED_NODE_VERSION=$(cat "${NVMRC_PATH}")
+
+	# match the version
+	MATCHED_NODE_VERSION=$(nvm_match_version ${REQUESTED_NODE_VERSION})
+
+	# determine if a version could be matched
+	if [[ -n "${MATCHED_NODE_VERSION}" && "${MATCHED_NODE_VERSION}" != "N/A" ]]; then
+
+		# unset the warning
+		unset AUTOSWITCH_NODE_SUPPRESS_WARNING
+
+		# use the matched version unless its already the current version
+		if [ "${CURRENT_NODE_VERSION}" != "${MATCHED_NODE_VERSION}" ]; then
+
+			# use the specified version
+			nvm use "${REQUESTED_NODE_VERSION}"
+		fi
+
+		return
+	fi
+
+	# determine if we already warned about this path
+	if [ "${AUTOSWITCH_NODE_SUPPRESS_WARNING}" = "${NVMRC_PATH}" ]; then
+
+		# move on immediately
+		return
+	fi
+
+	# get the relative path
+	RELATIVE_NVMRC_PATH=${NVMRC_PATH##*\/}
+
+	print-warn '' \
+		'WARNING: Node.JS version requested is not installed.' \
+		"	nvmrc path        : ${RELATIVE_NVMRC_PATH}" \
+		"	requested version : ${REQUESTED_NODE_VERSION}" \
+		"	current version   : ${CURRENT_NODE_VERSION}" \
+	''
+
+	# prompt the user to ask if they want to install now
+	if read -q "RES?${CLR_WARN}Would you like to install ${REQUESTED_NODE_VERSION} [y/N]: ${FORMAT_CLEAR}"; then
+
+		# add some whitespace
+		printf "\n\n"
+
+		# install
+		nvm install
+
+		# move on immediately
+		return
+	fi
+
+	# track the suppression warning
+	export AUTOSWITCH_NODE_SUPPRESS_WARNING=${NVMRC_PATH}
+}
+
+# add a hook to switch nvm version when changing directories
+autoload -U add-zsh-hook
+add-zsh-hook chpwd __numonic_nvm_use
+
+# invoke the initial check
+__numonic_nvm_use

@@ -1,0 +1,78 @@
+#! /usr/bin/env sh
+
+set -e
+
+__numonic_open_url() {
+	url=
+
+	while :; do
+		case $1 in
+			-d|--debug)
+				debug=1
+				;;
+			-h|--help)
+				man open-url
+				return 0
+				;;
+			-q|--quiet)
+				quiet=1
+				;;
+			--url)
+				url="${2}"
+				shift
+				;;
+			--url=*)
+				url="${1#*=}"
+				;;
+			*?)
+				if [ -z "${url:-}" ]; then
+					url="${1}"
+				else
+					print-fail "open-url: unknown argument ${1}"
+					man open-url | cat 1>&2
+					return 1
+				fi
+				;;
+			*)
+				break;
+		esac
+		shift
+	done
+
+	if [ -z "${url}" ]; then
+		print-fail "open-url: url must be supplied"
+		return 1
+	fi
+
+	(
+		if [ -n "${debug:-}" ]; then
+			set -x
+		fi
+
+		if [ -n "${quiet:-}" ]; then
+			exec 1>/dev/null
+		fi
+
+		# iterate over all well-known commands
+		for cmd in open gnome-open kde-open xdg-open sensible-browser; do
+
+			# detect if the command exists
+			if command -v ${cmd} 1>/dev/null 2>&1; then
+
+				# attempt to open
+				if ${cmd} "${url}" 1>/dev/null 2>&1; then
+
+					# print success if it was successful
+					print-success "open-url: opening ${url} via ${cmd}..."
+
+					return 0
+				fi
+			fi
+		done
+
+		# no open or browser was available (headless)
+		print-warn "open-url: please open a browser to: ${url}"
+	)
+}
+
+__numonic_open_url "$@"

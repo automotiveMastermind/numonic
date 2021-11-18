@@ -1,0 +1,37 @@
+#! /usr/bin/env sh
+
+set -e
+
+# detect platform
+if [ -f /etc/os-release ]; then
+	ID=$(. /etc/os-release && printf '%s' "${ID:-}")
+	ID_LIKE=$(. /etc/os-release && printf '%s' "${ID_LIKE:-}")
+
+	# detect fedora - edge case to add centos to list
+	if [ "${ID}" = "fedora" ]; then
+		ID_LIKE="centos ${ID_LIKE}"
+	fi
+
+	# detect linux mint - edge case to add debian to list
+	if [ "${ID}" = "linuxmint" ]; then
+		ID_LIKE="debian ${ID_LIKE}"
+	fi
+
+	# detect amzn and centos - edge case to remove fedora from list
+	# which are not the intended use of the ID_LIKE field
+	if [ "${ID}" = "amzn" ] || [ "${ID}" = "centos" ]; then
+		ID_LIKE=''
+	fi
+
+	UNAMES=$(printf '%s' "${ID} ${ID_LIKE} linux" | uniq)
+else
+	UNAMES=$(uname | tr '[:upper:]' '[:lower:]')
+fi
+
+# detect wsl
+if [ -d "/mnt/wsl" ]; then
+	UNAMES="wsl ${UNAMES}"
+fi
+
+# print the unames
+printf '%s' "${UNAMES}"

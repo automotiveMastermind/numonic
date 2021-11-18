@@ -1,0 +1,40 @@
+.TH "GIT-COMMIT-ALL" "1" "November 10, 2021" "Numonic v8.1.0" "Numonic
+Manual"
+.nh \" Turn off hyphenation by default.
+.SH NAME
+.PP
+git-commit-all - create a commit including all new, removed, or modified
+files within the working tree
+.SH SYNOPSIS
+.PP
+\f[B]git\f[R] \f[B]commit-all\f[R] [\f[B]-d\f[R] | \f[B]--debug\f[R]]
+[\f[B]-h\f[R] | \f[B]--help\f[R]] [\f[B]-q\f[R] | \f[B]--quiet\f[R]]
+.SH DESCRIPTION
+.PP
+This command updates the index using all content found within the
+working tree excluding those defined in a \f[B].gitignore\f[R] file.
+.SH OPTIONS
+.SS FLAGS
+.SS -d, --debug
+.PP
+print the commands as they are executed (set -x)
+.SS -h, --help
+.PP
+print this help information
+.SS -q, --quiet
+.PP
+suppress any output to stdout (any errors will still be printed)
+.SH EXAMPLES
+.SS git commit-all
+.PP
+track all files within the repository, excluding those defined in the
+\&.gitignore
+.SS git commit-all -d
+.SS git commit-all --debug
+.PP
+print the underlying git commands as they are executed
+.SH SEE ALSO
+.PP
+\f[B]git-commit\f[R](1), \f[B]git-add\f[R](1), \f[B]gitignore\f[R](5)
+.SH AUTHORS
+Deavon M. McCaffery

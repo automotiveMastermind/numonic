@@ -1,0 +1,48 @@
+---
+title: git-commit-amend
+---
+
+# NAME
+
+git-amend - amend the latest commit including all new, removed, or modified files within the working tree
+
+# SYNOPSIS
+
+**git** **commit-amend** [**-d** | **--debug**] [**-h** | **--help**] [**-q** | **--quiet**]
+
+# DESCRIPTION
+
+This command updates the index using all content found within the working tree excluding those defined in a `gitignore`
+file and adds these changes to the latest commit before opening an editor to allow the commit message to be modified.
+
+# OPTIONS
+
+## FLAGS
+
+### -h, --help
+
+print this help information
+
+### -d, --debug
+
+print the commands as they are executed (set -x)
+
+### -q, --quiet
+
+suppress any output to stdout (any errors will still be printed)
+
+# EXAMPLES
+
+## git amend
+
+track all files within the repository, excluding those defined in the .gitignore
+
+## git amend -d
+
+## git amend --debug
+
+print the underlying git commands as they are executed
+
+# SEE ALSO
+
+**git-commit**(1), **git-add**(1), **gitignore**(5)

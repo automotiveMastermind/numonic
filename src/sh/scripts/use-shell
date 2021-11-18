@@ -1,0 +1,117 @@
+#! /usr/bin/env sh
+
+set -e
+
+__numonic_use_shell() {
+
+	NUMONIC_SHELL=${NUMONIC_SHELL:-${1:-zsh}}
+	INSTALL_PATH="${NUMONIC_HOME}"/"${NUMONIC_SHELL}"/install
+
+	if [ -z "${NUMONIC_SHELL:-}" ]; then
+		print-fail "numonic: you must specify a shell to use, either sh, bash, or zsh."
+		return 1
+	fi
+
+	UNAMES=$(print-unames)
+
+	FOUND=
+
+	# iterate over each uname
+	for UNAME in ${UNAMES}; do
+
+		# get the uname install path
+		UNAME_PATH="${INSTALL_PATH}"/"${UNAME}".sh
+
+		# determine if an installer for the uname does not exist
+		if [ -f "${UNAME_PATH}" ]; then
+
+			# we found at least one installer
+			FOUND=1
+
+			# print success
+			print-success "numonic: installing prerequisites for ${NUMONIC_SHELL}: ${UNAME}"
+
+			# move on to the next uname
+			break
+		fi
+	done
+
+	# determine if we did not find any installer
+	if [ -z "${FOUND:-}" ]; then
+
+		print-fail "numonic: shell cannot be installed on this platform."
+		print-warn "Please open an issue to request support for this distribution."
+		return 1
+	fi
+
+	if command -v /opt/homebrew/bin/brew 1>/dev/null 2>&1; then
+		eval "$(/opt/homebrew/bin/brew shellenv)"
+	elif command -v brew 1>/dev/null 2>&1; then
+		eval "$(brew shellenv)"
+	else
+		if [ -d "${LOCALAPPDATA}"/git ]; then
+			LOCAL_PREFIX=$(printf "%s" "/${LOCALAPPDATA}/git" | sed -e 's/\\/\//g' -e 's/://')
+		elif [ -d /usr/local ]; then
+			LOCAL_PREFIX=/usr/local
+		else
+			LOCAL_PREFIX="${NUMONIC_LOCAL}"
+		fi
+		export LOCAL_PREFIX
+
+		if [ -d "${LOCAL_PREFIX}"/bin ]; then
+			export PATH="${LOCAL_PREFIX}/bin:${PATH}"
+		fi
+	fi
+
+	# run the installer
+	. "${UNAME_PATH}"
+
+	# determine if the shell could be found on the path
+	if ! command -v "${NUMONIC_SHELL}" 1>/dev/null 2>&1; then
+		print-fail "numonic: could not find ${NUMONIC_SHELL} on the path."
+		print-warn 'Please open an issue to request support for this distribution.'
+		return 1
+	fi
+
+	# get the prompt shell path
+	NUMONIC_SHELL_PATH=$(command -v "${NUMONIC_SHELL}")
+
+	# determine if the shell path is not already defined in /etc/shells
+	if ! grep "${NUMONIC_SHELL_PATH}" /etc/shells 1>/dev/null 2>&1; then
+
+		# add the shell path
+		print-success "numonic: adding updated ${NUMONIC_SHELL} to shells..."
+		sudo sh -c "printf '%s\n' \"${NUMONIC_SHELL_PATH}\" >> /etc/shells"
+	fi
+
+	if [ "${SHELL}" != "${NUMONIC_SHELL_PATH}" ]; then
+		print-success "setting ${NUMONIC_SHELL} to default shell for user..."
+		sudo chsh -s "${NUMONIC_SHELL_PATH}" "$(whoami)"
+
+		# set the default shell for the current session
+		export SHELL="${NUMONIC_SHELL_PATH}"
+	fi
+
+	# set the shell in home
+	printf '%s' "${NUMONIC_SHELL_PATH}" > "${HOME}"/.local/numonic/.shell
+
+	# shellcheck disable=SC2016
+	print-success '' \
+		'##############################################################################' \
+		'##############################################################################' \
+		'' \
+		'NOTE: to take advantage of the symbols used by the shell, please set the' \
+		'      the terminal font to `FiraCode Nerd Font Mono`. If you are using' \
+		'      either macOS terminal or gnome terminal, you can do this automatically' \
+		'      by loading a `theme`.' \
+		'' \
+		'PLEASE RUN THE FOLLOWING TO START USING THE NEW SHELL:' \
+		'' \
+		"exec ${SHELL} -l" \
+		'' \
+		'##############################################################################' \
+		'##############################################################################' \
+	''
+}
+
+__numonic_use_shell "$@"

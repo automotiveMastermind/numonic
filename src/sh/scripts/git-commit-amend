@@ -1,0 +1,36 @@
+#! /usr/bin/env sh
+
+set -e
+
+__numonic_git_commit_amend() {
+	while :; do
+		case $1 in
+			-d|--debug)
+				debug=1
+				;;
+			-h|--help)
+				man git commit-amend
+				return 0
+				;;
+			*?)
+				print-fail "git commit-amend: unknown argument ${1}"
+				man git commit-amend | cat 1>&2
+				return 1
+				;;
+			*)
+				break;
+		esac
+		shift
+	done
+
+	(
+		if [ -n "${debug:-}" ]; then
+			set -x
+		fi
+
+		git add --all
+		git commit --all --amend
+	)
+}
+
+__numonic_git_commit_amend "$@"

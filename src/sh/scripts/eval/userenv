@@ -1,0 +1,83 @@
+#! /usr/bin/env sh
+
+userenv() {
+		while :; do
+		case $1 in
+			-h|--help)
+				man userenv
+				return 0
+				;;
+			add)
+				shift
+				__numonic_userenv_add "$@"
+				return $?
+				;;
+			append)
+				shift
+				__numonic_userenv_append "$@"
+				return $?
+				;;
+			append-path)
+				shift
+				__numonic_userenv_append_path "$@"
+				return $?
+				;;
+			edit)
+				shift
+				__numonic_userenv_edit "$@"
+				return $?
+				;;
+			get)
+				shift
+				__numonic_userenv_get "$@"
+				return $?
+				;;
+			get-path)
+				shift
+				__numonic_userenv_get_path "$@"
+				return $?
+				;;
+			prepend)
+				shift
+				__numonic_userenv_prepend "$@"
+				return $?
+				;;
+			prepend-path)
+				shift
+				__numonic_userenv_prepend_path "$@"
+				return $?
+				;;
+			load)
+				shift
+				__numonic_userenv_load "$@"
+				return $?
+				;;
+			replace)
+				shift
+				__numonic_userenv_replace "$@"
+				return $?
+				;;
+			set)
+				shift
+				__numonic_userenv_set "$@"
+				return $?
+				;;
+			update-path)
+				shift
+				__numonic_userenv_update_path "$@"
+				return $?
+				;;
+			?*)
+				print-fail "userenv: command not found: ${1}"
+				man userenv | cat 1>&2
+				return 1
+				;;
+			*)
+				print-fail "userenv: a command must be specified"
+				man userenv | cat 1>&2
+				return 1
+				;;
+		esac
+		shift
+	done
+}

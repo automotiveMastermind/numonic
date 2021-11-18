@@ -1,0 +1,14 @@
+#! /usr/bin/env bash
+
+if [ -f "${HOME}"/.local/numonic/sh/profile ]; then
+	. "${HOME}"/.local/numonic/sh/profile
+fi
+
+if [ -f "${HOME}"/.local/numonic/bash/bash_profile ]; then
+	. "${HOME}"/.local/numonic/bash/bash_profile
+fi
+
+# this is required on macOS where bashrc is not loaded by default
+if [ -r "${HOME}"/.bashrc ]; then
+	. "${HOME}"/.bashrc
+fi

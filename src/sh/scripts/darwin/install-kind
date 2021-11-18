@@ -1,0 +1,16 @@
+#! /usr/bin/env sh
+
+__numonic_install_kind() {
+
+	# determine if kind is already available
+	if command -v kind 1>/dev/null 2>&1; then
+
+		# move on immediately
+		return
+	fi
+
+	print-success 'install-kind: installing cli...'
+	brew install kind
+}
+
+__numonic_install_kind "$@"

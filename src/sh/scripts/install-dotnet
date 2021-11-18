@@ -1,0 +1,154 @@
+#! /usr/bin/env sh
+
+set -e
+
+__numonic_install_dotnet() {
+	channels=
+	versions=
+
+	install_dir="${NUMONIC_SHARE}/dotnet"
+
+	while :; do
+		case $1 in
+			-d|--debug)
+				debug=1
+				;;
+			-h|--help)
+				man install-dotnet
+				return 0
+				;;
+			-c|--channel)
+				shift
+				channels="${channels} $1"
+				;;
+			--channel=*)
+				channels="${channels} ${1#*=}"
+				;;
+			-v|--version)
+				shift
+				versions="${versions} $1"
+				;;
+			--version=*)
+				versions="${versions} ${1#*=}"
+				;;
+			-f|--force)
+				if [ -d "${install_dir}" ]; then
+					rm --recursive --force "${install_dir}"
+				fi
+
+				if [ -d "${HOME}/dotnet" ]; then
+					rm --recursive --force "${HOME}/dotnet"
+				fi
+
+				if command -v dotnet 1>/dev/null 2>&1; then
+					print-fail "install-dotnet: dotnet is already on the path at: $(command -v dotnet)" \
+						'This version was not installed using numonic.' \
+						'Please remove using the package manager that was used to install it.'
+					return 1
+				fi
+				;;
+			?*)
+				print-fail "install-dotnet: too many arguments, argument: ${1} is unexpected"
+				man install-dotnet | cat 1>&2
+				return 1
+				;;
+			*)
+				break
+				;;
+		esac
+		shift
+	done
+
+	if command -v dotnet 1>/dev/null 2>&1; then
+		print-warn "install-dotnet: dotnet is already on the path at: $(command -v dotnet)" \
+			'to reinstall, use the --force flag'
+			man install-dotnet | cat 1>&2
+		return 1
+	fi
+
+	if [ -z "${channels:-}" ]; then
+		channels='Current'
+	fi
+
+	if [ ! -d "${install_dir}" ]; then
+		mkdir -p "${install_dir}"
+	fi
+
+	if command -v install-dotnet-prerequisites 1>/dev/null 2>&1; then
+		install-dotnet-prerequisites
+	fi
+
+	(
+		if [ -n "${debug:-}" ]; then
+			set -x
+		fi
+
+		DOTNET_INSTALL_SH="${install_dir}/dotnet-install.sh"
+		DOTNET_URI='https://dot.net/v1/dotnet-install.sh'
+
+		print-success "install-dotnet: downloading dotnet..."
+		download-safe "${DOTNET_URI}" "${DOTNET_INSTALL_SH}"
+		chmod +x "${DOTNET_INSTALL_SH}"
+
+		for DOTNET_VERSION in ${versions}; do
+			DOTNET_INSTALL_DIR="${install_dir}" "${DOTNET_INSTALL_SH}" --version "${DOTNET_VERSION}"
+		done
+
+		for DOTNET_CHANNEL in ${channels}; do
+			DOTNET_INSTALL_DIR="${install_dir}" "${DOTNET_INSTALL_SH}" --channel ${DOTNET_CHANNEL}
+		done
+
+		# symlink dotnet to the bin
+		ln -fs "${install_dir}"/dotnet "${NUMONIC_BIN}"
+
+		if [ ! -d "${HOME}/.dotnet/tools" ]; then
+			mkdir "${HOME}/.dotnet/tools"
+		fi
+
+		# setup completion
+		cat <<-'EOT' > "${install_dir}"/dotnet.bash.inc
+			__numonic_dotnet_bash_complete()
+			{
+				word=${COMP_WORDS[COMP_CWORD]}
+
+				completions="$(dotnet complete --position "${COMP_POINT}" "${COMP_LINE}" 2>/dev/null)"
+
+				if [ $? -ne 0 ]; then
+					completions=""
+				fi
+
+				mapfile -t COMPREPLY < <(compgen -W "${completions}" -- "${word}")
+			}
+
+			complete -f -F __numonic_dotnet_bash_complete dotnet
+		EOT
+
+		ln -fs "${install_dir}"/dotnet.bash.inc "${BASH_COMPLETION_DIR}"/dotnet.inc
+
+		cat <<-'EOT' > "${install_dir}"/dotnet.zsh.inc
+			__numonic_dotnet_zsh_complete()
+			{
+				COMPLETIONS=("$(dotnet complete "${WORDS}")")
+				reply=( "${(ps:\n:)COMPLETIONS}" )
+			}
+
+			compctl -K __numonic_dotnet_zsh_complete dotnet
+		EOT
+
+		ln -fs "${install_dir}"/dotnet.zsh.inc "${ZSH_COMPLETION_DIR}"/_dotnet
+	)
+
+	print-warn 'install-dotnet: building dotnet cache... (this may take a few minutes)'
+	dotnet help
+
+	# shellcheck disable=SC2016
+	print-warn '' \
+		'install-dotnet: start a new shell to enable tab completion...' \
+		'exec $SHELL -l'
+
+	. import-userenv
+	userenv set DOTNET_PATH="${install_dir}" 1>/dev/null 2>&1
+	userenv prepend-path "${HOME}/.dotnet/tools" 1>/dev/null 2>&1 || true
+}
+
+__numonic_install_dotnet "$@"

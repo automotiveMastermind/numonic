@@ -1,0 +1,80 @@
+#! /usr/bin/env sh
+
+separator=':'
+
+__numonic_userenv_append() {
+	__userenv_file="${HOME}"/.pam_environment
+	__userenv_name=
+	__userenv_value=
+
+	while :; do
+		case $1 in
+			-h|--help)
+				man userenv-append
+				return 0
+				;;
+			-s|--separator)
+				separator="${2}"
+				shift
+				;;
+			--separator=*)
+				separator="${1#*=}"
+				;;
+			-f|--file)
+				__userenv_file="${2}"
+				shift
+				;;
+			--file=*)
+				__userenv_file="${1#*=}"
+				;;
+			-dr|--dry-run)
+					positional="--dry-run"
+				;;
+			*=*)
+				__userenv_name="${1%%=*}"
+				__userenv_value="${1#*=}"
+				;;
+			*?)
+				if [ -z "${__userenv_name:-}" ]; then
+					__userenv_name="${1}"
+				elif [ -z "${__userenv_value:-}" ]; then
+					__userenv_value="${1}"
+				else
+					print-fail "userenv append: too many arguments, argument: ${1} is unexpected"
+					man userenv-append | cat 1>&2
+					return 1
+				fi
+				;;
+			*)
+				break
+				;;
+		esac
+		shift
+	done
+
+	if [ -z "${__userenv_name:-}" ]; then
+		print-fail 'userenv append: a name must be specified'
+		man userenv-append | cat 1>&2
+		return 1
+	fi
+
+	if [ -z "${__userenv_value:-}" ]; then
+		print-fail 'userenv append: a value must be specified'
+		man userenv-append | cat 1>&2
+		return 1
+	fi
+
+	current=$(userenv get "${__userenv_name}" --file="${__userenv_file}" 2>/dev/null || printf '')
+
+	if [ -n "${current:-}" ]; then
+		if [ "${current#*"${__userenv_value}""${separator}"}" != "${current}" ] \
+			|| [ "${current#*"${__userenv_value#/}""${separator}"}" != "${current}" ]; then
+			print-warn "userenv append: ${__userenv_name} variable already contains the specified value: ${__userenv_value}, ignoring..."
+			return 2
+		fi
+
+		__userenv_value="${current}${separator}${__userenv_value}"
+	fi
+
+	userenv set "${__userenv_name}"="${__userenv_value}" --file="${__userenv_file}" ${positional:-}
+}

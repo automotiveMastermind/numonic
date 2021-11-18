@@ -1,0 +1,58 @@
+cpus: 2
+memory: 4GiB
+disk: 100GiB
+
+ssh:
+  localPort: 0
+  loadDotSSHPubKeys: true
+
+mounts:
+  - location: "~"
+    writable: false
+  - location: "/tmp/lima"
+    writable: true
+
+images:
+  - location: "https://download.fedoraproject.org/pub/fedora/linux/releases/35/Cloud/x86_64/images/Fedora-Cloud-Base-35-1.2.x86_64.qcow2"
+    arch: "x86_64"
+    digest: "sha256:fe84502779b3477284a8d4c86731f642ca10dd3984d2b5eccdf82630a9ca2de6"
+  - location: "https://download.fedoraproject.org/pub/fedora/linux/releases/35/Cloud/aarch64/images/Fedora-Cloud-Base-35-1.2.aarch64.qcow2"
+    arch: "aarch64"
+    digest: "sha256:c71f2e6ce75b516d565e2c297ea9994c69b946cb3eaa0a4bbea400dbd6f59ae6"
+
+containerd:
+  system: false
+  user: false
+
+provision:
+  - mode: system
+    script: |
+      #!/bin/bash
+      set -eux -o pipefail
+      command -v podman >/dev/null 2>&1 && exit 0
+      dnf install -y podman crun
+      systemctl enable --now podman.socket
+  - mode: user
+    script: |
+      #!/bin/bash
+      set -eux -o pipefail
+      systemctl --user enable --now podman.socket
+
+probes:
+  - script: |
+      #!/bin/bash
+      set -eux -o pipefail
+      if ! timeout 30s bash -c "until command -v podman >/dev/null 2>&1; do sleep 3; done"; then
+        echo >&2 "podman is not installed yet"
+        exit 1
+      fi
+
+      sudo podman run --rm --privileged docker.io/aptman/qus --static -- --persistent --credential
+    hint: See "/var/log/cloud-init-output.log". in the guest
+
+portForwards:
+  - guestSocket: "/run/podman/podman.sock"
+    hostSocket: "{{.Home}}/.lima/podman/root.sock"
+
+  - guestSocket: "/run/user/{{.UID}}/podman/podman.sock"
+    hostSocket: "{{.Home}}/.lima/podman/user.sock"

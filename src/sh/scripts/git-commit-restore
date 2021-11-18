@@ -1,0 +1,42 @@
+#! /usr/bin/env sh
+
+set -e
+
+__numonic_git_commit_restore() {
+	positional=
+
+	while :; do
+		case $1 in
+			-d|--debug)
+				debug=1
+				;;
+			-h|--help)
+				man git-commit-restore
+				return 0
+				;;
+			*?)
+				if [ -z "${positional:-}" ]; then
+					positional="${1}"
+				else
+					positional="${positional} ${1}"
+				fi
+				;;
+			*)
+				break;
+		esac
+		shift
+	done
+
+	# shellcheck disable=SC2086
+	set -- ${positional}
+
+	(
+		if [ -n "${debug:-}" ]; then
+			set -x
+		fi
+
+		git restore --source=HEAD^ --staged "${*:-.}"
+	)
+}
+
+__numonic_git_commit_restore "$@"

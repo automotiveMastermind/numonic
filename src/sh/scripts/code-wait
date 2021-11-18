@@ -1,0 +1,10 @@
+#! /usr/bin/env sh
+
+set -e
+
+if command -v code 1>/dev/null 2>&1; then
+	code --wait "$@"
+else
+	print-warn 'code-wait: code was not found on the current path, using vi as a default editor'
+	vi "$@"
+fi

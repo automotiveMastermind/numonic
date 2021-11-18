@@ -1,0 +1,20 @@
+#! /usr/bin/env bash
+
+__numonic_set_gcloud_path() {
+
+	# detect gcloud
+	if ! command -v gcloud 1>/dev/null 2>&1; then
+
+		# attempt to discover the path
+		if [ ! -f "${NUMONIC_SHARE}"/gcloud/bin/gcloud ]; then
+
+			# no gcloud installed
+			return
+		fi
+
+		# add gcloud to the path
+		export PATH="${NUMONIC_SHARE}/gcloud/bin:${PATH}"
+	fi
+}
+
+__numonic_set_gcloud_path

@@ -1,0 +1,112 @@
+#! /usr/bin/env sh
+
+set -e
+
+__numonic_git_sha() {
+	org=
+	repo=
+	ref=
+
+	while :; do
+		case $1 in
+			--help)
+				man get-latest-release
+				return 0
+				;;
+			-dr|--dry-run)
+				dry_run=1
+				;;
+			--debug)
+				debug=1
+				;;
+			-o|--org|--organization|--organisation)
+				org="${2}"
+				shift
+				;;
+			--org=*|--organization=*|--organisation=*)
+				org="${1#*=}"
+				;;
+			-r|--repo|--repository)
+				repo="${2}"
+				shift
+				;;
+			--repo=*|--repository=*)
+				repo="${1#*=}"
+				;;
+			--ref)
+				ref="${2}"
+				shift
+				;;
+			--ref=*)
+				ref="${1#*=}"
+				;;
+			?*)
+				if [ -z "${org:-}" ]; then
+					org="${1}"
+				elif [ -z "${repo:-}" ]; then
+					repo="${1}"
+				elif [ -z "${ref:-}" ]; then
+					ref="${1}"
+				else
+					print-fail "git github-sha: too many arguments, argument: ${1} is unexpected"
+					man github-sha | cat 1>&2
+				fi
+				;;
+			*)
+				break
+				;;
+		esac
+		shift
+	done
+
+	if [ -z "${org:-}" ]; then
+		org="automotivemastermind"
+	fi
+
+	if [ -z "${repo:-}" ]; then
+		repo="numonic"
+	fi
+
+	if [ -z "${ref:-}" ]; then
+		ref="main"
+	fi
+
+	if [ -n "${dry_run:-}" ]; then
+		print-warn '' \
+			'GITHUB SHA' \
+			"org  : ${org}" \
+			"repo : ${repo}" \
+			"ref  : ${ref}" \
+		''
+
+		return 0
+	fi
+
+	(
+		if [ -n "${debug:-}" ]; then
+			set -x
+		fi
+
+		if [ -f "/run/secrets/GITHUB_TOKEN" ]; then
+			GITHUB_TOKEN=$(cat /run/secrets/GITHUB_TOKEN)
+		fi
+
+		if [ -n "${NUMONIC_TOKEN:-}" ]; then
+			set -- --header "'Authorization: token ${NUMONIC_TOKEN}'"
+		elif [ -n "${GITHUB_TOKEN:-}" ]; then
+			set -- --header "'Authorization: token ${GITHUB_TOKEN}'"
+		fi
+
+		set -- "$@" --silent --location "https://api.github.com/repos/${org}/${repo}/commits/${ref}"
+
+		sha=$(curl "$@" | jq -r '.sha')
+
+		if [ -z "${sha:-}" ]; then
+			return 1
+		fi
+
+		printf "%s\n" "${sha}"
+	)
+}
+
+__numonic_git_sha "$@"

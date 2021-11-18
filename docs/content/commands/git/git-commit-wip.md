@@ -1,0 +1,46 @@
+---
+title: git-commit-wip
+---
+
+# NAME
+
+git-commit-wip - create a new checkout commit and push it to the remote that is intended to save progress.
+
+# SYNOPSIS
+
+**git** **commit-wip** [**--dry-run**] [**--debug**] [**--help**]
+
+# DESCRIPTION
+
+This command creates a new checkpoint commit with a prefix of **\[WIP\]** for the subject. This is useful for saving
+progress as a new commit on the current HEAD and push the commit to the remote. A wip commit is retained both locally
+and on the remote.
+
+# OPTIONS
+
+## \<message\>, -m \<message\>, --message=\<message\>
+
+the message to include in the wip commit
+
+## --help
+
+print this help information
+
+## --debug
+
+print the commands as they are executed (set -x)
+
+# EXAMPLES
+
+## git commit-wip
+
+create an save commit with a subject of: **\[WIP\]** and push to the remote
+
+## git commit-wip --debug some message
+
+create a commit with a subject of: **\[WIP\] some message** and push to the remote while printing the commands as they
+are executed
+
+# SEE ALSO
+
+**git-commit-mark**(1), **git-commit-save**(1), **git-commit-restore**(1), **git-commit-undo**(1), **git-commit**(1)

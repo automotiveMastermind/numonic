@@ -1,0 +1,146 @@
+name: end-to-end
+
+# run the pipeline only during a pull request or a push to a versioned branch
+on: pull_request
+
+# cancel any in progress runs from the same source branch (pull request)
+concurrency:
+  group: end-to-end-${{ github.head_ref }}
+  cancel-in-progress: true
+
+# the end-to-end pipeline only requires permissions to read the contents of the repo and its associated metadata
+permissions:
+  contents: read
+  metadata: read
+
+jobs:
+  # lint - run shellcheck across all shell scripts
+  lint-shell:
+    name: lint-shell
+    runs-on: ubuntu-20.04
+    container: koalaman/shellcheck-alpine:stable
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: run-lint
+        run: ./hack/lint-shell.sh
+
+  hint-container:
+    name: lint-containerfile
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: hadolint/hadolint-action@v1.6.0
+        with:
+          dockerfile: Containerfile
+
+  os:
+    name: "end-to-end-${{ matrix.os }}"
+    runs-on: ${{ matrix.os }}
+    needs:
+      - cancel
+      - lint
+    strategy:
+      matrix:
+        os:
+          - macos-11.0
+          - macos-10.15
+          - ubuntu-20.04
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: install-bash
+        run: ./hack/install.sh bash
+      - name: run-tests-bash
+        run: ./hack/test.sh bash
+      - name: install-zsh
+        run: ./hack/install.sh zsh
+      - name: run-tests-zsh
+        run: ./hack/test.sh zsh
+
+  win:
+    name: "end-to-end-${{ matrix.os }}"
+    runs-on: ${{ matrix.os }}
+    needs:
+      - cancel
+      - lint
+    strategy:
+      matrix:
+        os:
+          - windows-2019
+          - windows-2022
+    defaults:
+      run:
+        shell: wsl-bash -u build {0}
+    steps:
+      - name: setup-wsl
+        uses: vampire/setup-wsl@v1
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: install-pre
+        run: ./hack/pre.apt.sh
+        shell: wsl-bash -u root {0}
+      - name: install-bash
+        run: ./hack/install.sh bash
+      - name: run-tests-bash
+        run: ./hack/test.sh bash
+      - name: install-zsh
+        run: ./hack/install.sh zsh
+      - name: run-tests-zsh
+        run: ./hack/test.sh zsh
+
+  container-apt:
+    name: "end-to-end-${{ matrix.container }}"
+    runs-on: ubuntu-20.04
+    container: ${{ matrix.container }}
+    needs:
+      - cancel
+      - lint
+    strategy:
+      matrix:
+        container:
+          - debian:10
+          - debian:11
+          - ubuntu:20.04
+          - ubuntu:21.10
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: install-pre
+        run: ./hack/pre.apt.sh
+      - name: install-bash
+        run: gosu build ./hack/install.sh bash
+      - name: run-tests-bash
+        run: gosu build ./hack/test.sh bash
+      - name: install-zsh
+        run: gosu build ./hack/install.sh zsh
+      - name: run-tests-zsh
+        run: gosu build ./hack/test.sh zsh
+
+  container-yum:
+    name: "end-to-end-${{ matrix.container }}"
+    runs-on: ubuntu-20.04
+    container: ${{ matrix.container }}
+    needs:
+      - cancel
+      - lint
+    strategy:
+      matrix:
+        container:
+          - fedora:34
+          - fedora:35
+          - centos:8
+          - amazonlinux:2
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: install-pre
+        run: ./hack/pre.yum.sh
+      - name: install-bash
+        run: gosu build ./hack/install.sh bash
+      - name: run-tests-bash
+        run: gosu build ./hack/test.sh bash
+      - name: install-zsh
+        run: gosu build ./hack/install.sh zsh
+      - name: run-tests-zsh
+        run: gosu build ./hack/test.sh zsh

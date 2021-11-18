@@ -1,0 +1,7 @@
+#! /usr/bin/env sh
+
+printf "\n%s\n" "numonic: using default shell"
+
+if [ -f "${HOME}"/.local/numonic/sh/profile ]; then
+	. "${HOME}"/.local/numonic/sh/profile
+fi

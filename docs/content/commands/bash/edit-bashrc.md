@@ -1,0 +1,53 @@
+---
+title: edit-bashrc
+---
+
+# NAME
+
+edit-bashrc - opens an editor to the user-specific bash startup script
+
+# SYNOPSIS
+
+**edit-bashrc** [**-d** | **--debug**] [**-h** | **--help**]
+
+# DESCRIPTION
+
+This command will open the editor defined by the **EDITOR** environment variable. If the variable is not set then the
+default editor will be **vi**. Note that numonic will detect whether or not Visual Studio Code is available on the
+current PATH and will set this to the default editor if not otherwise set in the user environment (**userenv**).
+
+The user-specific bash startup script is located at:
+
+\$HOME/.local/share/bashrc
+
+If the file does not exist, it will be created with the correct shebang for bash.
+
+For simple environment variables, we highly recommend using the **userenv** commands, which will make environment
+variables available across different shells (both bash and zsh) and supports directory-specific variables as well.
+
+# OPTIONS
+
+## FLAGS
+
+### -d, --debug
+
+print the commands as they are executed (set -x)
+
+### -h, --help
+
+print this help information
+
+# EXAMPLES
+
+## edit-bashrc
+
+open the default editor to the user-specific bash startup script
+
+## edit-bashrc --debug
+
+open the default editor to the user-specific bash startup script while printing the commands as they are executed
+
+# SEE ALSO
+
+[**userenv**(1)](https://automotivemastermind.github.io/numonic/userenv/),
+[**bash**(1)](https://man7.org/linux/man-pages/man1/bash.1.html), **editor**(1)

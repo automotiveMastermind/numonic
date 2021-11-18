@@ -1,0 +1,36 @@
+#! /usr/bin/env sh
+
+set -e
+
+__numonic_show_all() {
+	while :; do
+		case $1 in
+			--debug)
+				debug=1
+				;;
+			--help)
+				man show-all
+				return 0
+				;;
+			*?)
+				print-fail "show-all: unknown argument ${1}"
+				man show-all | cat 1>&2
+				return 1
+				;;
+			*)
+				break;
+		esac
+		shift
+	done
+
+	(
+		if [ -n "${debug:-}" ]; then
+			set -x
+		fi
+
+		defaults write com.apple.finder AppleShowAllFiles TRUE
+		killall Finder
+	)
+}
+
+__numonic_show_all "$@"

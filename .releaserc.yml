@@ -1,0 +1,15 @@
+branches:
+  - main
+
+plugins:
+  - "@semantic-release/commit-analyzer"
+  - "@semantic-release/release-notes-generator"
+  - "@semantic-release/changelog"
+  - path: "@semantic-release/exec"
+    prepareCmd: printf '%s' ${nextRelease.gitTag} > VERSION
+  - path: "@semantic-release/github"
+  - path: "@semantic-release/git"
+    assets:
+      - CHANGELOG.md
+      - VERSION
+      - src/local/share/man

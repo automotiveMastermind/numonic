@@ -1,0 +1,27 @@
+#! /usr/bin/env sh
+
+__numonic_userenv_get_path() {
+	if [ -z "${PATH}" ]; then
+		print-fail "userenv get-path: PATH variable is not set"
+		return 1
+	fi
+
+	old="${PATH}:"
+	new=
+
+	while [ -n "${old}" ]; do
+		current=${old%%:*}
+		case ${new}: in
+			*:"${current}":*)
+				;;
+			*)
+				if [ -n "${current}" ]; then
+					new="${new}:${current}"
+				fi
+				;;
+		esac
+		old=${old#*:}
+	done
+
+	printf '%s' "${new}"
+}

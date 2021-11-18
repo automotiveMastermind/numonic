@@ -1,0 +1,13 @@
+#! /usr/bin/env sh
+
+if command -v pyenv 1>/dev/null 2>&1; then
+  eval "$(pyenv init -)"
+  return
+fi
+
+PYTHON=$(command -v python3 || command -v python)
+
+if [ -n "${PYTHON}" ]; then
+	USER_BASE_PATH=$(${PYTHON} -m site --user-base)
+	export PATH="${USER_BASE_PATH}/bin:${PATH}"
+fi

@@ -1,0 +1,110 @@
+.TH "GIT-PULL-REQUEST" "1" "November 10, 2021" "Numonic v8.1.0" "Numonic
+Manual"
+.nh \" Turn off hyphenation by default.
+.SH NAME
+.PP
+git-pull-request - prepares a new commit
+.SH SYNOPSIS
+.PP
+\f[B]git\f[R] \f[B]pull-request\f[R] <\f[I]branch\f[R]>
+[<\f[I]upstream\f[R]>] [\f[B]-p\f[R][<\f[I]origin\f[R]>] |
+[\f[B]--push\f[R][\f[B]=\f[R]<\f[I]origin\f[R]>]] [\f[B]-dr\f[R] |
+\f[B]--dry-run\f[R]] [\f[B]-d\f[R] | \f[B]--debug\f[R]] [\f[B]-h\f[R] |
+\f[B]--help\f[R]]
+.PP
+\f[B]git\f[R] \f[B]pull-request\f[R] \f[B]-b\f[R] <\f[I]branch\f[R]>
+[\f[B]-u\f[R] <\f[I]upstream\f[R]>] [\f[B]-p\f[R] [<\f[I]origin\f[R]>]]
+.PP
+\f[B]git\f[R] \f[B]pull-request\f[R]
+\f[B]--branch=\f[R]<\f[I]branch\f[R]>
+[\f[B]--upstream=\f[R]<\f[I]upstream\f[R]>]
+[\f[B]--push\f[R][\f[B]=\f[R]<\f[I]origin\f[R]>]]
+.SH DESCRIPTION
+.PP
+This command creates a new commit on the current HEAD branch and
+performs a rebase of the specified <\f[I]branch\f[R]> on the specified
+<\f[I]remote\f[R]>, which should bring the current branch up to date for
+a linear, fast-forward only pull request.
+.SH OPTIONS
+.SS <branch>, -b <branch>, --branch=<branch>
+.PP
+name of the branch used to rebase the current branch from the origin
+DEFAULT: main | master
+.SS <upstream>, -u <upstream>, --upstream=<upstream>
+.PP
+name of the upstream used to rebase the current branch DEFAULT: upstream
+| origin
+.SS -p, -p <origin>, --push, --push=<origin>
+.PP
+push the newly created commit to the optionally specified origin
+DEFAULT: origin
+.SS -i, --interactive
+.PP
+perform an interactive rebase with the upstream remote
+.SS -dr, --dry-run
+.PP
+print the branch, origin, and start point without creating the actual
+branch
+.SS -h, --help
+.PP
+print this help information
+.SS -d, --debug
+.PP
+print the commands as they are executed (set -x)
+.SH DEFAULTS
+.PP
+If a branch name is not specified, then \f[B]main\f[R] will be used.
+If \f[B]main\f[R] does not exist on the upstream, a fallback to
+\f[B]master\f[R] will be used.
+We highly recommend renaming \f[B]master\f[R] branches in projects to
+\f[B]main\f[R] as support for the fallback will be removed in a future
+version.
+.PP
+If the \f[B]--upstream\f[R] remote is not specified, then
+\f[B]upstream\f[R] will be used.
+If \f[B]upstream\f[R] does not exist as a remote, then \f[B]origin\f[R]
+will be used.
+This is intended to support contributions made using both forks and
+feature branches.
+We recommend using a feature branch even on forks as the git extensions
+support updating the origin from the remote for the main branch.
+.PP
+If the \f[B]--push\f[R] flag is specified without specifing a remote,
+then \f[B]origin\f[R] will be used.
+By default, this command will not push the newly minted commit to the
+origin.
+The use of the \f[B]--push\f[R] flag is required to enable this
+behaviour.
+.SH EXAMPLES
+.SS git pull-request
+.PP
+prepare a pull request commit by rebasing the current head on the
+upstream remote using the main branch
+.SS git pull-request next
+.SS git pull-request -b next
+.SS git pull-request --branch=next
+.PP
+prepare a pull request commit by rebasing the current HEAD on the
+upstream remote using the next branch
+.SS git pull-request next shared
+.SS git pull-request -b next -u shared
+.SS git pull-request --branch=next --upstream=shared
+.PP
+prepare a pull request commit by rebasing the current HEAD on the shared
+remote using the next branch
+.SS git pull-request --push
+.PP
+prepare a pull request commit by rebasing the current head on the
+upstream remote using the main branch; then push the commits to the
+origin remote using the current branch name
+.SS git pull-request -u shared -p shared
+.SS git pull-request --upstream=shared --push=shared
+.PP
+prepare a pull request commit by rebasing the current HEAD on the shared
+remote using the main branch; then push the commit to the shared remote
+using the current branch name
+.SH SEE ALSO
+.PP
+\f[B]git-commit-all\f[R](1), \f[B]git-push\f[R](1)
+.SH AUTHORS
+Deavon M. McCaffery

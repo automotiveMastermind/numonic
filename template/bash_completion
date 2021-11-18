@@ -1,0 +1,25 @@
+#! /usr/bin/env sh
+
+# determine if the bash completion dir exists
+if [ ! -d "${BASH_COMPLETION_DIR}" ]; then
+
+	# move on immediately
+	return 0
+fi
+
+# iterate over each completion
+for completion in "${BASH_COMPLETION_DIR}"/*; do
+
+	# determine if the file exists (would not exist if there are no files in the dir)
+	if [ ! -f "${completion}" ]; then
+		# move on immediately
+		continue
+	fi
+
+	# attempt to source the completion
+	if ! . "${completion}"; then
+
+		# print a failure
+		print-fail "bash-completion: ${completion} failed with exit code: $?"
+	fi
+done

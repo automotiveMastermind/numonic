@@ -1,0 +1,31 @@
+#! /usr/bin/env sh
+
+__numonic_source_os() {
+
+	UNAMES=$(print-unames)
+	UNAMES=$(reverse "${UNAMES}")
+
+	for current in ${UNAMES}; do
+		UNAME_PATH="${NUMONIC_HOME}/sh/scripts/${current}"
+
+		if [ ! -d "${UNAME_PATH}" ]; then
+			continue
+		fi
+
+		export NUMONIC_OS="${current}"
+		export PATH="${UNAME_PATH}:${PATH}"
+
+		if [ -d "${UNAME_PATH}/eval" ]; then
+			for eval_script in "${UNAME_PATH}"/eval/*; do
+
+				if [ ! -f "${eval_script}" ]; then
+					break
+				fi
+
+				 eval "$(cat "${eval_script}")"
+			done
+		fi
+	done
+}
+
+__numonic_source_os

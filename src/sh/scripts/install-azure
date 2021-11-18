@@ -1,0 +1,115 @@
+#! /usr/bin/env sh
+
+set -e
+
+__numonic_install_azure() {
+	install_dir="${NUMONIC_SHARE}/azure"
+
+	while :; do
+		case $1 in
+			-d|--debug)
+				debug=1
+				;;
+			-h|--help)
+				man git-commit-all
+				return 0
+				;;
+			-f|--force)
+				if [ -d "${install_dir}" ]; then
+					rm --recursive --force "${install_dir}"
+				fi
+
+				if command -v az 1>/dev/null 2>&1; then
+					print-fail "install-azure: az is already on the path at: $(command -v az)" \
+						'This version was not installed using numonic.' \
+						'Please remove using the package manager that was used to install it.'
+					return 1
+				fi
+				;;
+			?*)
+				print-fail "install-azure: too many arguments, argument: ${1} is unexpected"
+				man install-azure | cat 1>&2
+				return 1
+				;;
+			*)
+				break
+				;;
+		esac
+		shift
+	done
+
+	if command -v az 1>/dev/null 2>&1; then
+		print-warn "install-azure: az is already on the path at: $(command -v az)" \
+			'to reinstall, use the --force flag'
+		man install-azure | cat 1>&2
+		return 1
+	fi
+
+	if command -v python3 1>/dev/null 2>&1; then
+		python_cmd=$(command -v python3)
+	elif command -v python 1>/dev/null 2>&1; then
+		python_cmd=$(command -v python)
+	elif command -v install-python 1>/dev/null 2>&1; then
+		install-python
+		python_cmd=$(command -v python3 || command -v python)
+	else
+		print-fail "install-azure: neither python3 nor python is available on the PATH." \
+			"please install python3 via a package manager"
+		man install-azure | cat 1>&2
+		return 1
+	fi
+
+	ve_version='16.7.7'
+	ve_archive="virtualenv-${ve_version}.tar.gz"
+	ve_url="https://pypi.python.org/packages/source/v/virtualenv/${ve_archive}"
+
+	(
+		if [ -n "${debug:-}" ]; then
+			set -x
+		fi
+
+		temp=$(mktemp -d)
+		download-safe "${ve_url}" "${temp}/virtualenv.tar.gz"
+
+		tar --extract \
+			--gzip \
+			--strip-components=1 \
+			--file="${temp}"/virtualenv.tar.gz \
+			--directory="${temp}"
+
+		print-warn 'intall-azure: creating virtual environment for azure-cli...'
+		${python_cmd} "${temp}/virtualenv.py" --python "${python_cmd}" "${install_dir}" 1>/dev/null
+
+		python_cmd="${install_dir}"/bin/python
+
+		print-warn 'install-azure: upgrading pip in virtual environment...'
+		${python_cmd} -m pip install --cache-dir="${temp}" --upgrade pip 1>/dev/null
+
+		print-warn 'install-azure: installing azure-cli, this may take a minute or two...'
+		${python_cmd} -m pip install --cache-dir="${temp}" --upgrade azure-cli 1>/dev/null
+
+		cat <<-EOT > "${install_dir}/bin/az"
+			#!/usr/bin/env sh
+			${python_cmd} -m azure.cli "\$@"
+		EOT
+
+		# symlink azure cli
+		ln -fs "${install_dir}"/bin/az "${NUMONIC_BIN}"
+
+		# symlink completion
+		az_completion="${install_dir}"/bin/az.completion.sh
+		if [ -f "${az_completion}" ]; then
+			ln -fs "${az_completion}" "${BASH_COMPLETION_DIR}"/az.inc
+			ln -fs "${az_completion}" "${ZSH_COMPLETION_DIR}"/_az
+		fi
+	)
+
+	az config set extension.use_dynamic_install=yes_without_prompt
+	print-success 'install-azure: the azure-cli is now ready'
+
+	. import-userenv
+	userenv set AZURE_CLI_PATH="${install_dir}" 1>/dev/null 2>&1
+	userenv prepend-path "${install_dir}/bin" 1>/dev/null 2>&1 || true
+}
+
+__numonic_install_azure "$@"

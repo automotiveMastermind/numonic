@@ -1,0 +1,12 @@
+#! /usr/bin/env sh
+
+set -e
+
+__numonic_print_fail()
+{
+	printf '%s' "${CLR_FAIL}"
+	printf '%s\n' "$@"
+	printf '%s' "${FORMAT_NO_TTY}${CLR_FAIL}${FORMAT_CLEAR}"
+}
+
+__numonic_print_fail "$@" 1>&2

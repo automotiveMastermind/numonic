@@ -1,0 +1,51 @@
+---
+title: userenv-set
+---
+
+# NAME
+
+userenv-set - sets the value of a variable within the user specific environment file
+
+# SYNOPSIS
+
+**userenv set** <*key*> <*value*> [**-h** | **--help**]
+
+**userenv set** <*key*>**=**<*value*> [**-h** | **--help**]
+
+## DESCRIPTION
+
+This command adds or replaces a variable within the user specific environment file, typically located at
+$HOME/.pam_environment. If the variable already exists, then the command will overwrite the existing value. To replace
+a value if and only if it already exists, use **userenv replace**. To add a new variable if and only if it does not
+already exist, use **userenv add**.
+
+Once the new variable is set, the environment will be loaded to ensure that the value is available within the
+current shell session.
+
+# OPTIONS
+
+## \<key\>
+
+the key (or name) of the environment variable to set
+
+## \<value\>
+
+the value of the environment variable to set
+
+## -h, --help
+
+print this help information
+
+# EXAMPLES
+
+## userenv set abc 123
+
+set a variable named abc with a value of 123
+
+## userenv set abc=123
+
+set a variable named abc with a value of 123
+
+# SEE ALSO
+
+**userenv-edit**(1), **userenv-add**(1), **userenv-replace**(1), **userenv-load**(1), **pam_env**(7)

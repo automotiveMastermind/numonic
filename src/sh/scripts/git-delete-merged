@@ -1,0 +1,84 @@
+#! /usr/bin/env sh
+
+set -e
+
+__numonic_git_delete_merged() {
+	branch=
+
+	while :; do
+		case $1 in
+			--help)
+				man git-delete-merged
+				return 0
+				;;
+			-dr|--dry-run)
+				dry_run=1
+				;;
+			--debug)
+				debug=1
+				;;
+			--branch)
+				branch="$2"
+				shift
+				;;
+			--branch=*)
+				branch="${1#*=}"
+				;;
+			?*)
+				if [ -z "${branch:-}" ]; then
+					branch="$1"
+				else
+					print-fail "git delete-merged: too many arguments, argument: ${1} is unexpected"
+					man git-done | cat 1>&2
+					return 1
+				fi
+				;;
+			*)
+				break
+				;;
+		esac
+		shift
+	done
+
+	if [ -z "${branch:-}" ]; then
+		branch="next"
+	fi
+
+	default=
+	exclude=
+
+	for current in "${branch}" develop next main master; do
+		if git show-ref --quiet --verify "refs/heads/${current}"; then
+			if [ -z "${default:-}" ]; then
+				default="${current}"
+			fi
+
+			if [ -z "${exclude:-}" ]; then
+				exclude="${current}"
+			elif [ "${exclude#"${current}"}" = "${exclude}" ]; then
+				exclude="${exclude}|${current}"
+			fi
+		fi
+	done
+
+	print-warn '' \
+		'GIT DELETE MERGED' \
+		"exclude : ${exclude}" \
+	''
+
+	if [ -n "${dry_run:-}" ]; then
+		return 0
+	fi
+
+	(
+		if [ -n "${debug:-}" ]; then
+			set -x
+		fi
+
+		git branch --merged "${branch}" \
+			| grep -Ev " ${exclude}" \
+			| xargs git branch -d 2>/dev/null
+	)
+}
+
+__numonic_git_delete_merged "$@"

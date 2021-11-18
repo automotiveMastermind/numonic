@@ -1,0 +1,28 @@
+#! /usr/bin/env sh
+
+set -e
+
+# test for arguments
+if [ ! "$@" ]; then
+	# print an error
+	print-fail "\n%s\n\n" "you must specify a key id"
+
+	# list all of the keys
+	gpg -K
+
+	# exit with an error
+	exit 1
+fi
+
+# get all of the keygrips for the secret key
+KEYGRIPS="$(gpg --with-keygrip --list-secret-keys "$@" | grep Keygrip | awk '{print $3}')"
+
+# iterate over each keygrip
+for keygrip in ${KEYGRIPS}; do
+
+	# remove the keygrip
+	rm "${HOME}/.gnupg/private-keys-v1.d/${keygrip}.key" 2>/dev/null || true
+done
+
+# print the card status
+gpg --card-status

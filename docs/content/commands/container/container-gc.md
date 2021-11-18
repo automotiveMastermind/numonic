@@ -1,0 +1,53 @@
+---
+title: container-gc
+---
+
+# NAME
+
+container-gc - garbage collects all stopped containers and dangling volumes and images for both podman and docker
+
+# SYNOPSIS
+
+**container-gc** [**-d** | **--debug**] [**-h** | **--help**] [**-q** | **--quiet**]
+
+# DESCRIPTION
+
+This command will prune all containers and dangling volumes and images for both podman and docker. At least one of these
+must be available on the **PATH** or the command will fail. If both are on the **PATH**, then both will be pruned.
+
+The command essentially performs the following where \<command\> is either `podman` or `docker`:
+
+\<command\> container prune --force
+\<command\> volume prune --force
+\<command\> image prune --force
+
+# OPTIONS
+
+## FLAGS
+
+### -d, --debug
+
+print the commands as they are executed (set -x)
+
+### -h, --help
+
+print this help information
+
+### -q, --quiet
+
+suppress any output to stdout (any errors will still be printed)
+
+# EXAMPLES
+
+## container-gc
+
+garbage collect both docker and podman, if available
+
+## container-gc --debug
+
+garbage collect both docker and podman, if available, while printing the commands as they are executed
+
+# SEE ALSO
+
+[**podman-container-prune**(1)](https://docs.podman.io/en/latest/markdown/podman-container-prune.1.html),
+[**sh**(1)](https://man.openbsd.org/sh.1)

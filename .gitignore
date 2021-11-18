@@ -1,0 +1,32 @@
+# hidden files and folders
+.*
+
+# vscode
+!.vscode/
+
+# configuration
+!.gitignore
+!.gitattributes
+!.editorconfig
+!.taplo.toml
+!.gitkeep
+!.containerignore
+
+# semver management
+!.releaserc*
+
+# node
+node_modules/
+!.eslintrc.yaml
+!.eslintignore
+package-lock.json
+
+# github
+!.github/
+
+# log files
+*.logs
+*.log
+
+# windows crap
+Thumbs.db

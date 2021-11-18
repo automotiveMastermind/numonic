@@ -1,0 +1,61 @@
+.TH "USERENV-APPEND-PATH" "1" "November 10, 2021" "Numonic
+v8.1.0" "Numonic Manual"
+.nh \" Turn off hyphenation by default.
+.SH NAME
+.PP
+userenv-append-path - appends a path to the end of the \f[B]PATH\f[R]
+variable within the user specific environment file
+.SH SYNOPSIS
+.PP
+\f[B]userenv append-path\f[R] [<\f[I]path\f[R]>] [\f[B]-f\f[R]
+<\f[I]file\f[R]>] [\f[B]-h\f[R] | \f[B]--help\f[R]]
+.PP
+\f[B]userenv append-path\f[R] [<\f[I]path\f[R]>]
+[\f[B]--file=\f[R]<\f[I]file\f[R]>] [\f[B]-h\f[R] | \f[B]--help\f[R]]
+.SH DESCRIPTION
+.PP
+This command will append the specified path to the \f[B]PATH\f[R]
+variable witihn the user specific environment file, typically located at
+$HOME/.pam_environment.
+The separator will always be a colon (:).
+.PP
+If the specified path is already in the \f[B]PATH\f[R] variable, then
+the command will fail with an exit code of 2.
+For all other errors, the exit code will be 1.
+.SH OPTIONS
+.SS <path>
+.PP
+the path to append to the end of the \f[B]PATH\f[R] variable DEFAULT:
+\[dq]${PWD}\[dq]
+.SS -h, --help
+.PP
+print this help information
+.SS -f <file>, --file=<file>
+.PP
+the path of the environment file to read and write DEFAULT:
+$HOME/.pam_environment
+.SH DEFAULTS
+.PP
+If no path is specified, the command will use append the current path of
+the shell.
+.PP
+If no file is specified, then the default user specific environment file
+location of $HOME/.pam_environment will be used.
+.SH EXAMPLES
+.SS userenv append-path
+.PP
+append the current path to the end of the \f[B]PATH\f[R] variable
+.SS userenv append-path \[ti]/my-app/bin
+.PP
+append a specific path to the end of the \f[B]PATH\f[R] variable
+.SS userenv append-path -f \[ti]/my-variables
+.SS userenv append-path --file=\[ti]/my-variables
+.PP
+append a specific path to the end of the \f[B]PATH\f[R] variable within
+the specified environments file ($HOME/my-variables)
+.SH SEE ALSO
+.PP
+\f[B]userenv-prepend-path\f[R](1), \f[B]userenv-load\f[R](1),
+\f[B]environ\f[R](7), \f[B]pam_env\f[R](7)
+.SH AUTHORS
+Deavon M. McCaffery

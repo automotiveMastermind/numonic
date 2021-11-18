@@ -1,0 +1,21 @@
+#! /usr/bin/env zsh
+
+__numonic_set_window_title() {
+	# set the window title
+	printf "\033]0; %s \007" "${USER}@${HOSTNAME%%.*} -:- ${PWD##*/}"
+}
+
+# detect starship
+if command -v starship 1>/dev/null 2>&1; then
+
+	# set the starship configuration path
+	if [ -f "${NUMONIC_SHARE}/starship.toml" ]; then
+		export STARSHIP_CONFIG="${NUMONIC_SHARE}/starship.toml"
+	fi
+
+	# use starship
+	eval "$(starship init zsh)"
+fi
+
+# set the window title command
+precmd_functions+=(__numonic_set_window_title)

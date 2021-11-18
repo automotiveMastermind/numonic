@@ -1,0 +1,44 @@
+.TH "GIT-COMMIT-WIP" "1" "November 10, 2021" "Numonic v8.1.0" "Numonic
+Manual"
+.nh \" Turn off hyphenation by default.
+.SH NAME
+.PP
+git-commit-wip - create a new checkout commit and push it to the remote
+that is intended to save progress.
+.SH SYNOPSIS
+.PP
+\f[B]git\f[R] \f[B]commit-wip\f[R] [\f[B]--dry-run\f[R]]
+[\f[B]--debug\f[R]] [\f[B]--help\f[R]]
+.SH DESCRIPTION
+.PP
+This command creates a new checkpoint commit with a prefix of
+\f[B][WIP]\f[R] for the subject.
+This is useful for saving progress as a new commit on the current HEAD
+and push the commit to the remote.
+A wip commit is retained both locally and on the remote.
+.SH OPTIONS
+.SS <message>, -m <message>, --message=<message>
+.PP
+the message to include in the wip commit
+.SS --help
+.PP
+print this help information
+.SS --debug
+.PP
+print the commands as they are executed (set -x)
+.SH EXAMPLES
+.SS git commit-wip
+.PP
+create an save commit with a subject of: \f[B][WIP]\f[R] and push to the
+remote
+.SS git commit-wip --debug some message
+.PP
+create a commit with a subject of: \f[B][WIP] some message\f[R] and push
+to the remote while printing the commands as they are executed
+.SH SEE ALSO
+.PP
+\f[B]git-commit-mark\f[R](1), \f[B]git-commit-save\f[R](1),
+\f[B]git-commit-restore\f[R](1), \f[B]git-commit-undo\f[R](1),
+\f[B]git-commit\f[R](1)
+.SH AUTHORS
+Deavon M. McCaffery

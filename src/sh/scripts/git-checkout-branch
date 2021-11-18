@@ -1,0 +1,100 @@
+#! /usr/bin/env sh
+
+set -e
+
+__numonic_git_checkout_branch() {
+
+	branch=
+	remote=
+	ref=
+
+	while :; do
+		case $1 in
+			-dr|--dry-run)
+				dry_run=1
+				;;
+			-d|--debug)
+				debug=1
+				;;
+			-b|--branch)
+				branch="${2}"
+				shift
+				;;
+			--branch=*)
+				branch="${1#*=}"
+				;;
+			-r|--remote)
+				remote="${2}"
+				shift
+				;;
+			--remote=*)
+				remote="${1#*=}"
+				;;
+			-ref|-sp|--ref|--start-point)
+				ref="${2}"
+				shift
+				;;
+			--ref=*|--start-point=*)
+				ref="${1#*=}"
+				;;
+			-h|--help)
+				man git-checkout-branch
+				return 0
+				;;
+			?*)
+				if [ -z "${branch:-}" ]; then
+					branch="${1}"
+				elif [ -z "${remote:-}" ]; then
+					remote="${1}"
+				elif [ -z "${ref:-}" ]; then
+					ref="${1}"
+				else
+					print-fail "git checkout-branch: too many arguments, argument: ${1} is unexpected"
+					man git-checkout-branch | cat 1>&2
+					return 1
+				fi
+				;;
+			*)
+				break
+				;;
+		esac
+		shift
+	done
+
+	if [ -z "${branch}" ]; then
+		print-fail "git checkout-branch: a branch name must be specified"
+		man git-checkout-branch | cat 1>&2
+		return 1
+	fi
+
+	if [ -z "${remote}" ]; then
+		remote="origin"
+	fi
+
+	if [ -z "${ref}" ]; then
+		ref="HEAD"
+	fi
+
+	print-warn '' \
+		'GIT CHECKOUT BRANCH' \
+		"branch      : ${branch}" \
+		"remote      : ${remote}" \
+		"start-point : ${ref}" \
+	''
+
+	if [ -n "${dry_run:-}" ]; then
+		return 0
+	fi
+
+	(
+		if [ -n "${debug:-}" ]; then
+			set -x
+		fi
+
+		git pull 2>&1
+		git checkout --recurse-submodules -b "${branch}" "${ref}"
+		git push --set-upstream "${remote}" "${branch}"
+	)
+}
+
+__numonic_git_checkout_branch "$@"

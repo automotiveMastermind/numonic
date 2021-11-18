@@ -1,0 +1,53 @@
+#! /usr/bin/env sh
+
+__numonic_userenv_get () {
+	__userenv_file="${HOME}"/.pam_environment
+	__userenv_name=
+
+	while :; do
+		case $1 in
+			--help)
+				man userenv-edit
+				return 0
+				;;
+			-f|--file)
+				__userenv_file="${2}"
+				shift
+				;;
+			--file=*)
+				__userenv_file="${1#*=}"
+				;;
+			*?)
+				if [ -z "${__userenv_name:-}" ]; then
+					__userenv_name="${1}"
+				else
+					print-fail "userenv-get: too many arguments, argument: ${1} is unexpected"
+					man userenv-get | cat 1>&2
+					return 1
+				fi
+				;;
+			*)
+				break
+				;;
+		esac
+		shift
+	done
+
+	if [ -z "${__userenv_name}" ]; then
+		print-fail 'userenv-get: a name must be specified'
+		man userenv-get | cat 1>&2
+		return 1
+	fi
+
+	if [ ! -f "${__userenv_file}" ]; then
+		touch "${__userenv_file}"
+	fi
+
+	if ! grep "^${__userenv_name}=" "${__userenv_file}" 1>/dev/null 2>&1; then
+		print-fail "userenv-get: the variable ${__userenv_name} does not exist"
+		man userenv-get | cat 1>&2
+		return 1
+	fi
+
+	grep "^${__userenv_name}=" "${__userenv_file}" | sed -E "s%^${__userenv_name}=\"?([^\"]+)\"?.*$%\1%"
+}

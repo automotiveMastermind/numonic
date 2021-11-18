@@ -1,0 +1,53 @@
+.TH "CONTAINER-UPDATE" "1" "November 10, 2021" "Numonic v8.1.0" "Numonic
+Manual"
+.nh \" Turn off hyphenation by default.
+.SH NAME
+.PP
+container-update - pulls the latest image layer or manifest for each tag
+that is locally cached within both podman and docker
+.SH SYNOPSIS
+.PP
+\f[B]container-update\f[R] [\f[B]-d\f[R] | \f[B]--debug\f[R]]
+[\f[B]-h\f[R] | \f[B]--help\f[R]] [\f[B]-q\f[R] | \f[B]--quiet\f[R]]
+.SH DESCRIPTION
+.PP
+This command pulls the latest image layer or manifest for each tag that
+is locally cached within both podman and docker.
+At least one of these must be available on the \f[B]PATH\f[R] or the
+command will fail.
+If both are on the \f[B]PATH\f[R], then both will be updated.
+This is primarily useful for images are up to date locally when
+referencing vanity tags.
+.PP
+The command essentially performs the following:
+.PP
+<command> images --filter dangling=false --format \[rs]
+\[aq]{{.Repository}}:{{Tag}} | xargs -L1 <command> pull
+.SH OPTIONS
+.SS FLAGS
+.SS -d, --debug
+.PP
+print the commands as they are executed (set -x)
+.SS -h, --help
+.PP
+print this help information
+.SS -q, --quiet
+.PP
+suppress any output to stdout (any errors will still be printed)
+.SH EXAMPLES
+.SS container-update
+.PP
+pull the latest image layer or manifest for each tag that is locally
+cached within both podman and docker
+.SS container-update -d
+.SS container-update --debug
+.PP
+pull the latest image layer or manifest for each tag that is locally
+cached within both podman and docker while printing the commands as they
+are executed
+.SH SEE ALSO
+.PP
+\f[B]podman-images\f[R](1) (https://docs.podman.io/en/latest/markdown/podman-images.1.html),
+\f[B]podman-pull\f[R](1) (https://docs.podman.io/en/latest/markdown/podman-pull.1.html)
+.SH AUTHORS
+Deavon M. McCaffery

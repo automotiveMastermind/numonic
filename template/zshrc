@@ -1,0 +1,13 @@
+#! /usr/bin/env zsh
+
+if [ -n "${NUMONIC_ZSH:-}" ]; then
+	return
+fi
+
+printf "\n%s\n" "numonic: using zsh shell"
+
+if [ -f "${HOME}"/.local/numonic/zsh/zshrc ]; then
+	. "${HOME}"/.local/numonic/zsh/zshrc
+fi
+
+NUMONIC_ZSH=1

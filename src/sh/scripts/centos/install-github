@@ -1,0 +1,14 @@
+#! /usr/bin/env sh
+
+__numonic_install_github() {
+	if command -v gh 1>/dev/null 2>&1; then
+		return
+	fi
+
+	print-success 'installing github cli...'
+	sudo dnf install -y 'dnf-command(config-manager)'
+	sudo dnf config-manager --add-repo https://cli.github.com/packages/rpm/gh-cli.repo
+	sudo dnf install -y gh
+}
+
+__numonic_install_github

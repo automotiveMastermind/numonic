@@ -1,0 +1,93 @@
+---
+title: userenv-append
+man_title: USERENV-APPEND
+man_section: 1
+man_header: Numonic Manual
+man_footer: Numonic v8.1.0
+revision_date: November 10, 2021
+hyphenate: false
+authors:
+  - Deavon M. McCaffery
+---
+
+---
+title: userenv-append
+---
+
+# NAME
+
+userenv-append - appends a value to the end of a variable within the user specific environment file
+
+# SYNOPSIS
+
+**userenv append** <*key*> <*value*> [**-s** <*separator*>] [**-f** <*file*>] [**-h** | **--help**]
+
+**userenv append** <*key*>**=**<*value*> [**--separator=**<*separator*>] [**--file=**<*file*>] [**-h** | **--help**]
+
+# DESCRIPTION
+
+This command will append the specified value to the end of a variable within the user specific environment file,
+typically located at $HOME/.pam_environment. If the variable does not already exist, it will be created using the
+specified value. An optional separator can be defined. If the separator is not defined, then the value will be separated
+using a colon (:).
+
+If the specified value already exists within the variable, the command will fail with an exit code of 2. All other
+errors will return an exit code of 1.
+
+Once the change has been made, it should be available within the current shell.
+
+# OPTIONS
+
+## \<key\>
+
+the key (or name) of the environment variable to append
+
+## \<value\>
+
+the value of the environment variable to append
+
+## -s \<separator\>, --separator=\<separator\>
+
+the separator to use when appending the value
+
+## -f \<file\>, --file=\<file\>
+
+the path of the environment file to read and write
+DEFAULT: $HOME/.pam_environment
+
+## -h, --help
+
+print this help information
+
+# DEFAULTS
+
+If the separator is not specified, the default will be the colon (:) character. For example if a value of 123 is
+appended to an existing variable called my_var with a value of abc, then the result will be: my_var=abc:123 by default.
+
+If no file is specified, then the default user specific environment file location of $HOME/.pam_environment will be
+used.
+
+# EXAMPLES
+
+## userenv append abc 123
+
+## userenv append abc=123
+
+append a variable named abc with a value of 123 using the default colon as a separator
+
+## userenv append abc 123 -s ','
+
+## userenv append abc=123 --separator=','
+
+append a variable named abc with the value of 123 using a comma as a separator
+
+## userenv append abc 123 -f ~/my-variables
+
+## userenv append abc=123 --file=~/my-variables
+
+append a variable named abc with a value of 123 from the specified file ($HOME/my-variables) using the default colon as
+a separator
+
+# SEE ALSO
+
+**userenv-prepend**(1), **userenv-load**(1), **pam_env**(7)

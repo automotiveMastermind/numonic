@@ -1,0 +1,14 @@
+#! /usr/bin/env bash
+
+__numonic_edit_zshrc() {
+
+	ZSHRC_PATH="${NUMONIC_SHARE}/zshrc"
+
+	if [ ! -f "${ZSHRC_PATH}" ]; then
+		printf "%s\n\n" "#! /usr/bin/env zsh" > "${ZSHRC_PATH}"
+	fi
+
+	${EDITOR:-vi} "${ZSHRC_PATH}"
+}
+
+__numonic_edit_zshrc

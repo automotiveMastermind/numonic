@@ -1,0 +1,14 @@
+#! /usr/bin/env sh
+
+if [ -d /Applications/Docker.app/Contents/Resources/etc ]; then
+	DOCKER_PATH=/Applications/Docker.app/Contents/Resources/etc
+elif [ -d "${HOME}/Applications/Docker.app/Contents/Resources/etc" ]; then
+	DOCKER_PATH="${HOME}/Applications/Docker.app/Contents/Resources/etc"
+fi
+
+if [ -n "${DOCKER_PATH:-}" ]; then
+	for completion in "${DOCKER_PATH}"/*.bash-completion; do
+		# shellcheck disable=SC1090
+		. "${completion}"
+	done
+fi

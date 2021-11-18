@@ -1,0 +1,146 @@
+name: Bug Report
+description: Report a bug when using numonic.
+title: "feat(shell): "
+labels: ["needs triage", "bug"]
+assignees:
+  - numonic-maintainers
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for using numonic. We appreciate you taking the time to provide feedback!  Providing as much detail
+        as possible will help us triage the issue quickly and efficiently.
+
+  - type: textarea
+    id: bug-reproduce
+    attributes:
+      label: Commands to Reproduce
+      description: |
+        Please provide the commands used to reproduce the bug.  This will be automatically formatted so no need to
+        include backticks.
+      placeholder: |
+        1.
+        2.
+        3.
+        ...
+      render: sh
+    validations:
+      required: true
+
+  - type: textarea
+    id: bug-expected
+    attributes:
+      label: Expected Results
+      description: Please describe what you expected to happen.
+      render: markdown
+    validations:
+      required: false
+
+  - type: textarea
+    id: bug-actual
+    attributes:
+      label: Actual Results
+      description: Please describe what actually happened.
+      render: markdown
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Any additional logs that will help us?
+      description: |
+        Please copy and paste any relevant logs. This will be automatically formatted so no need to include backticks.
+      render: sh
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: os-names
+    attributes:
+      label: Operating System(s)
+      description: What is/are the operating system(s) where the bug is known to occur?
+      options:
+        - macOS
+        - Ubuntu
+        - Debian
+        - Fedora
+        - CentOS
+        - Amazon Linux
+        - Windows (WSL)
+        - other
+    validations:
+      required: true
+
+  - type: input
+    id: os-names-other
+    attributes:
+      label: Operating System (Other)
+      description: If you chose `other` above, please let us know what other OSs you are using.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: os-architecture
+    attributes:
+      label: Architecture
+      description: What is/are the architecture(s) where the bug is known to occur?
+      options:
+        - arm64 / aarch64
+        - amd64 / x86_64
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: term-shell
+    attributes:
+      label: Shell
+      description: What is/are the shell(s) where the bug is known to occur?
+      options:
+        - zsh
+        - bash
+        - sh
+        - other
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: term-names
+    attributes:
+      label: Terminal Program(s)
+      description: What is/are the name(s) of the terminal program(s) you are using or would like to use with numonic?
+      options:
+        - apple
+        - gnome
+        - vscode
+        - other
+    validations:
+      required: true
+
+  - type: input
+    id: term-names-other
+    attributes:
+      label: Terminal Program(s) (Other)
+      description: If you chose `other` above, please let us know what other terminal programs you are using.
+    validations:
+      required: false
+
+  - type: input
+    id: os-uname
+    attributes:
+      label: What is the output from `uname -srv` on the system(s) where the bug is occurring?
+      description: |
+        Please copy and paste the output from `uname -srv`
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: code-of-conduct
+    attributes:
+      label: Code of Conduct
+      description: |
+        By submitting this issue, you agree to follow our
+        [Code of Conduct](https://automotivemastermind.io/governance/code-of-conduct)
+      options:
+        - label: I agree to follow this project's code of conduct
+          required: true

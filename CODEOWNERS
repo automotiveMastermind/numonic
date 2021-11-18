@@ -1,0 +1,13 @@
+@automotiveMastermind/Administrators
+
+# this file
+CODEOWNERS @sjk07 @dmccaffery
+
+# workflows
+/.github/ @sjk07 @dmccaffery
+
+# install scripts
+**/install/ @sjk07 @dmccaffery
+install.sh @sjk07 @dmccaffery
+bootstrap.sh @sjk07 @dmccaffery
+entrypoint.sh @sjk07 @dmccaffery

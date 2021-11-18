@@ -1,0 +1,13 @@
+{
+    "$schema": "https://aka.ms/terminal-profiles-schema",
+    "profiles": {
+        "defaults": {
+            "antialiasingMode": "cleartype",
+            "colorScheme": "numonic-dark",
+            "font": {
+                "face": "FiraCode NF Retina",
+                "size": 10
+            }
+        }
+    }
+}

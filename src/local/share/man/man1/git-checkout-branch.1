@@ -1,0 +1,112 @@
+.TH "GIT-CHECKOUT-BRANCH" "1" "November 10, 2021" "Numonic
+v8.1.0" "Numonic Manual"
+.nh \" Turn off hyphenation by default.
+.SH NAME
+.PP
+git-checkout-branch - create a new branch with the specified name and
+tracks the branch in the origin
+.SH SYNOPSIS
+.PP
+\f[B]git\f[R] \f[B]checkout-branch\f[R] <\f[I]branch\f[R]>
+[<\f[I]remote\f[R]>] [<\f[I]start-point\f[R]>] [\f[B]-d\f[R] |
+\f[B]--debug\f[R]] [\f[B]-dr\f[R] | \f[B]--dry-run\f[R]] [\f[B]-h\f[R] |
+\f[B]--help\f[R]] [\f[B]-q\f[R] | \f[B]--quiet\f[R]]
+.PP
+\f[B]git\f[R] \f[B]checkout-branch\f[R] \f[B]-b\f[R] <\f[I]branch\f[R]>
+[\f[B]-r\f[R] <\f[I]remote\f[R]>] [\f[B]-sp\f[R]
+<\f[I]start-point\f[R]>]
+.PP
+\f[B]git\f[R] \f[B]checkout-branch\f[R]
+\f[B]--branch=\f[R]<\f[I]branch\f[R]>
+[\f[B]--remote=\f[R]<\f[I]remote\f[R]>]
+[\f[B]--start-point=\f[R]<\f[I]start-point\f[R]>]
+.SH DESCRIPTION
+.PP
+This command creates a new branch with the specified \f[B]branch\f[R]
+name.
+The newly created branch will then be pushed to the specified
+\f[B]remote\f[R], which is \f[B]origin\f[R] by default.
+A \f[B]start-point\f[R] can also be supplied that can be used as the
+\f[B]HEAD\f[R] for the newly created branch.
+If a \f[B]start-point\f[R] is not supplied, then the \f[B]HEAD\f[R] of
+the current working tree will be used instead.
+.PP
+If there are any untracked changes on the current working tree, they
+will be moved to the new branch.
+.PP
+This is essentially equivelant to the following git commands:
+.IP
+.nf
+\f[C]
+git pull
+git checkout --recurse-submodules -b \[rs]<branch\[rs]> \[rs]<start-point\[rs]>
+git push --set-upstream \[rs]<remote\[rs]> \[rs]<branch\[rs]>
+\f[R]
+.fi
+.SH OPTIONS
+.SS ARGUMENTS
+.SS <branch>, -b <branch>, --branch=<branch>
+.PP
+name of the branch to create
+.SS <remote>, -r <remote>, --remote=<remote>
+.PP
+name of the remote where the resulting branch should be tracked
+.SS <start-point>, -sp <start-point>, --start-point=<start-point>
+.PP
+name of a commit at which to start the new branch; see
+\f[B]git-branch\f[R](1) for details.
+Defaults to \f[B]HEAD\f[R]
+.PP
+As a special case, you may use \f[B]\[dq]A...B\[dq]\f[R] as a shortcut
+for the merge base of \f[B]A\f[R] and \f[B]B\f[R] if their is exactly
+one merge base.
+You can leave out at most one of \f[B]A\f[R] and \f[B]B\f[R], in which
+case it defaults to \f[B]HEAD\f[R].
+.SS FLAGS
+.SS -d, --debug
+.PP
+print the commands as they are executed (set -x)
+.SS -dr, --dry-run
+.PP
+print the branch, remote, and start point without creating the actual
+branch
+.SS -h, --help
+.PP
+print this help information
+.SS -q, --quiet
+.PP
+suppress any output to stdout (any errors will still be printed)
+.SH EXAMPLES
+.SS git checkout-branch feat/something-new
+.SS git checkout-branch -b feat/something-new
+.SS git checkout-branch --branch=feat/something-new
+.PP
+create a new branch tracked by the \f[B]origin\f[R] called
+\f[B]feat/something-new\f[R] using the \f[B]HEAD\f[R] of the current
+branch
+.SS git checkout-branch feat/something-new upstream
+.SS git checkout-branch -b feat/something-new -r upstream
+.SS git checkout-branch --branch=feat/something-new --remote=upstream
+.PP
+create a new branch tracked by the \f[B]upstream\f[R] called
+\f[B]feat/something-new\f[R] using the \f[B]HEAD\f[R] of the current
+branch
+.SS git checkout-branch feat/something-new upstream HEAD\[ti]1
+.SS git checkout-branch -b feat/something-new -r upstream -sp HEAD\[ti]1
+.SS git checkout-branch --branch=feat/something-new --remote=upstream --start-point=HEAD\[ti]1
+.PP
+create a new branch tracked by the \f[B]upstream\f[R] called
+\f[B]feat/something-new\f[R] using the previous commit of \f[B]HEAD\f[R]
+of the current branch
+.SS git checkout-branch --branch feat/something-new --start-point HEAD\[ti]1
+.SS git checkout-branch --branch=feat/something-new --start-point=HEAD\[ti]1
+.PP
+create a new branch tracked by the \f[B]origin\f[R] called
+\f[B]feat/something-new\f[R] using the previous commit of \f[B]HEAD\f[R]
+of the current branch
+.SH SEE ALSO
+.PP
+\f[B]git-checkout\f[R](1), \f[B]git-switch\f[R](1),
+\f[B]git-push\f[R](1)
+.SH AUTHORS
+Deavon M. McCaffery; Not Committed Yet

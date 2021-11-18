@@ -1,0 +1,42 @@
+.TH "NUMONIC-BASH" "7" "November 10, 2021" "Numonic v8.1.0" "Numonic
+Manual"
+.nh \" Turn off hyphenation by default.
+.SH NAME
+.PP
+numonic-bash - an explanation of the well-known configuration and
+shell-specific commands for using numonic with bash
+.SH SYNOPSIS
+.PP
+numonic-bash
+.SH DESCRIPTION
+.PP
+Numonic strives to fully support both bash and zsh.
+As such there are very few commands that are available in only one
+shell, which are mostly related to the specific implementation of the
+startup/shutdown files for the shell in question.
+.SH CONFIGURATION
+.PP
+Numonic will always take ownership of and overwrite the default user
+startup/shutdown files.
+This is intended to ensure successful update paths and compatibility
+across the board.
+There is, however, full support for user-specific overrides, which are
+always loaded \f[I]after\f[R] the default files.
+.PP
+For bash, the following files are owned by numonic and cannot be
+modified by the user as these files will be overwritten on every update:
+.PP
+$HOME/.bash_profile $HOME/.bashrc $HOME/.bash_completion
+.PP
+To override any of the default configuration included by these files,
+please use the following location:
+.PP
+$HOME/.local/share/bashrc
+.PP
+The \f[B]edit-bashrc\f[R] command will automatically create this file if
+does not already exist and open the file in the default editor.
+.SH SEE ALSO
+.PP
+\f[B]edit-bashrc\f[R](1)
+.SH AUTHORS
+Deavon M. McCaffery

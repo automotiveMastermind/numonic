@@ -1,0 +1,18 @@
+#! /usr/bin/env sh
+
+set -e
+
+__numonic_remove_backup() {
+	BACKUP=$1
+
+	if [ -z "${BACKUP:-}" ]; then
+		BACKUP='numonic'
+	fi
+
+	REMOVE_PATH="${AM_HOME}/backup/${BACKUP}"
+
+	print-warn "removing path: ${REMOVE_PATH}..."
+	rm -rf "${AM_HOME}/backup/${BACKUP}" 2>/dev/null
+}
+
+__numonic_remove_backup "$@"

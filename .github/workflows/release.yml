@@ -1,0 +1,53 @@
+name: release
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@master
+        with:
+          persist-credentials: false
+
+      - name: install-node
+        uses: actions/setup-node@master
+
+      - name: generate-docs
+        run: ./hack/docs-generate.sh
+
+      - name: generate-manpages
+        uses: docker://pandoc/core:2.16
+        with:
+          entrypoint: /bin/sh
+          args: -c './hack/docs-manpages.sh'
+
+      - name: semantic-release-prerequisites
+        run: |
+          npm install --no-package-lock --no-save \
+            @semantic-release/commit-analyzer \
+            @semantic-release/release-notes-generator \
+            @semantic-release/changelog \
+            @semantic-release/exec \
+            @semantic-release/github \
+            @semantic-release/git
+
+      - name: semantic-release-dry-run
+        run: npx semantic-release --ci --dry-run
+        if: ${{ github.event.repository.fork }}
+
+      - name: semantic-release
+        run: npx semantic-release --ci
+        if: ${{ !github.event.repository.fork }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.SEMANTIC_RELEASE_TOKEN }}

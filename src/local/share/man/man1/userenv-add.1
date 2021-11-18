@@ -1,0 +1,59 @@
+.TH "USERENV-ADD" "1" "November 10, 2021" "Numonic v8.1.0" "Numonic
+Manual"
+.nh \" Turn off hyphenation by default.
+.SH NAME
+.PP
+userenv-add - adds a new variable to the user specific environment file
+.SH SYNOPSIS
+.PP
+\f[B]userenv add\f[R] <\f[I]key\f[R]> <\f[I]value\f[R]> [\f[B]-f\f[R]
+<\f[I]file\f[R]>] [\f[B]-h\f[R] | \f[B]--help\f[R]]
+.PP
+\f[B]userenv add\f[R] <\f[I]key\f[R]>\f[B]=\f[R]<\f[I]value\f[R]>
+[\f[B]--file=\f[R]<\f[I]file\f[R]>] [\f[B]-h\f[R] | \f[B]--help\f[R]]
+.SS DESCRIPTION
+.PP
+This command adds a new variable to the user specific environment file,
+typically located at $HOME/.pam_environment.
+If the variable already exists, then the command will fail.
+To set or add an existing variable, use \f[B]userenv set\f[R].
+To update a variable if and only if it already exists, use \f[B]userenv
+replace\f[R].
+.PP
+Once the new variable is added, the environment will be loaded to ensure
+that the new variable is available within the current shell session.
+.SH OPTIONS
+.SS <key>
+.PP
+the key (or name) of the environment variable to add
+.SS <value>
+.PP
+the value of the environment variable to add
+.SS -f <file>, --file=<file>
+.PP
+the path of the environment file to read and write DEFAULT:
+$HOME/.pam_environment
+.SS -h, --help
+.PP
+print this help information
+.SH DEFAULTS
+.PP
+If no file is specified, then the default user specific environment file
+location of $HOME/.pam_environment will be used.
+.SH EXAMPLES
+.SS userenv add abc 123
+.SS userenv add abc=123
+.PP
+add a variable named abc with a value of 123
+.SS userenv add abc 123 -f \[ti]/my-variables
+.SS userenv add abc=123 --file=\[ti]/my-variables
+.PP
+add a variable named abc with a value of 123 to the specified file
+($HOME/my-variables)
+.SH SEE ALSO
+.PP
+\f[B]userenv-set\f[R](1), \f[B]userenv-edit\f[R](1),
+\f[B]userenv-replace\f[R](1), \f[B]userenv-get\f[R](1),
+\f[B]userenv-load\f[R](1), \f[B]pam_env\f[R](7)
+.SH AUTHORS
+Deavon M. McCaffery

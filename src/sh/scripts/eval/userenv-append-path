@@ -1,0 +1,72 @@
+#! /usr/bin/env sh
+
+__numonic_userenv_append_path() {
+	__userenv_file="${HOME}"/.pam_environment
+	__userenv_value=
+
+	while :; do
+		case $1 in
+			-h|--help)
+				man userenv-append-path
+				return 0
+				;;
+			-f|--file)
+				__userenv_file="${2}"
+				shift
+				;;
+			--file=*)
+				__userenv_file="${1#*=}"
+				;;
+			-dr|--dry-run)
+				positional="--dry-run"
+				;;
+			*?)
+				if [ -z "${__userenv_value:-}" ]; then
+					__userenv_value="${1}"
+				else
+					print-fail "userenv append-path: too many arguments, argument: ${1} is unexpected"
+					man userenv-append-path | cat 1>&2
+					return 1
+				fi
+				;;
+			*)
+				break
+				;;
+		esac
+		shift
+	done
+
+	if [ -z "${__userenv_value:-}" ]; then
+		print-fail 'userenv append-path: a path must be specified'
+		man userenv-append-path | cat 1>&2
+		return 1
+	fi
+
+	if [ ! -d "${__userenv_value}" ]; then
+		print-fail "userenv append-path: path ${__userenv_value} does not exist"
+		man userenv-append-path | cat 1>&2
+		return 1
+	fi
+
+	set -- --file="${__userenv_file}" ${positional:-}
+
+	current="$(userenv get USER_PATH 2>/dev/null):"
+
+	if [ -n "${current:-}" ]; then
+		if [ "${current#*"${__userenv_value}":}" != "${current}" ] \
+			|| [ "${current#*"${__userenv_value%/}":}" != "${current}" ]; then
+			print-warn "userenv append-path: ${__userenv_value} already exists in the PATH variable"
+			return 1
+		fi
+	fi
+
+	set -- "$@" USER_PATH="${__userenv_value}"
+	userenv append "$@"
+
+	# get the final path
+	PATH="${PATH}:${current:-}"
+	PATH=$(userenv get-path)
+
+	# export the path
+    eval "$(export PATH="${PATH}")"
+}

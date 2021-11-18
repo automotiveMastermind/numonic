@@ -1,0 +1,49 @@
+#! /usr/bin/env sh
+
+set -e
+
+__numonic_git_commit_save() {
+	message="SAVE"
+
+	while :; do
+		case $1 in
+			-d|--debug)
+				debug=1
+				;;
+			-h|--help)
+				man git-commit-save
+				return 0
+				;;
+			-m|--message)
+				message="[SAVE] ${2}"
+				shift
+				;;
+			--message=*)
+				message="[SAVE] ${1#*=}"
+				;;
+			*?)
+				if [ "${message}" = "[SAVE]" ]; then
+					message="[SAVE] ${1}"
+				else
+					print-fail "git commit-save: too many arguments, argument: ${1} is unexpected"
+					man git-commit-save | cat 1>&2
+					return 1
+				fi
+				;;
+			*)
+				break;
+		esac
+		shift
+	done
+
+	(
+		if [ -n "${debug:-}" ]; then
+			set -x
+		fi
+
+		git add --all
+		git commit --all --message "${message}"
+	)
+}
+
+__numonic_git_commit_save "$@"

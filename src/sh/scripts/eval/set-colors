@@ -1,0 +1,59 @@
+#! /usr/bin/env sh
+# shellcheck disable=SC2155
+
+if [ -t 1 ]; then
+	export FORMAT_CLEAR="$(tput sgr0)"		# CLEAR ALL FORMAT
+	export FORMAT_BOLD="$(tput bold)"		# SET BRIGHT/BOLD
+	export FORMAT_DIM="$(tput dim)"			# SET DIM/HALF-BRIGHT
+	export FORMAT_UNDERLINE="$(tput smul)"	# SET UNDERLINE
+	export FORMAT_NO_TTY='' 				# SET NO-TTY
+
+	export CLR_BLACK="$(tput setaf 0)"		# ANSI BLACK (GRAY)
+	export CLR_RED="$(tput setaf 1)"		# ANSI RED
+	export CLR_GREEN="$(tput setaf 2)"		# ANSI GREEN
+	export CLR_YELLOW="$(tput setaf 3)"		# ANSI YELLOW
+	export CLR_BLUE="$(tput setaf 4)"		# ANSI BLUE
+	export CLR_MAGENTA="$(tput setaf 5)"	# ANSI MAGENTA (PURPLE)
+	export CLR_CYAN="$(tput setaf 6)"		# ANSI CYAN
+	export CLR_WHITE="$(tput setaf 7)"		# ANSI WHITE
+
+	export CLR_BRIGHT_BLACK="${FORMAT_BOLD}${CLR_BLACK}"		# BRIGHT BLACK (GRAY)
+	export CLR_BRIGHT_RED="${FORMAT_BOLD}${CLR_RED}"			# BRIGHT RED
+	export CLR_BRIGHT_GREEN="${FORMAT_BOLD}${CLR_GREEN}"		# BRIGHT GREEN
+	export CLR_BRIGHT_YELLOW="${FORMAT_BOLD}${CLR_YELLOW}"		# BRIGHT YELLOW
+	export CLR_BRIGHT_BLUE="${FORMAT_BOLD}${CLR_BLUE}"			# BRIGHT BLUE
+	export CLR_BRIGHT_MAGENTA="${FORMAT_BOLD}${CLR_MAGENTA}"	# BRIGHT MAGENTA (PURPLE)
+	export CLR_BRIGHT_CYAN="${FORMAT_BOLD}${CLR_CYAN}"			# BRIGHT CYAN
+	export CLR_BRIGHT_WHITE="${FORMAT_BOLD}${CLR_WHITE}"		# BRIGHT WHITE
+
+	export CLR_SUCCESS="${CLR_BRIGHT_GREEN}"
+	export CLR_WARN="${CLR_BRIGHT_YELLOW}"
+	export CLR_FAIL="${CLR_BRIGHT_RED}"
+else
+	export FORMAT_CLEAR=''
+	export FORMAT_BOLD=''
+	export FORMAT_DIM=''
+	export FORMAT_UNDERLINE=''
+	export FORMAT_NO_TTY="\n"
+
+	export CLR_BLACK=''
+	export CLR_RED=''
+	export CLR_GREEN=''
+	export CLR_YELLOW=''
+	export CLR_BLUE=''
+	export CLR_MAGENTA=''
+	export CLR_CYAN=''
+	export CLR_WHITE=''
+	export CLR_BRIGHT_BLACK=''
+	export CLR_BRIGHT_RED=''
+	export CLR_BRIGHT_GREEN=''
+	export CLR_BRIGHT_YELLOW=''
+	export CLR_BRIGHT_BLUE=''
+	export CLR_BRIGHT_MAGENTA=''
+	export CLR_BRIGHT_CYAN=''
+	export CLR_BRIGHT_WHITE=''
+
+	export CLR_SUCCESS="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"
+	export CLR_WARN="********************************************************************************\n"
+	export CLR_FAIL="################################################################################\n"
+fi

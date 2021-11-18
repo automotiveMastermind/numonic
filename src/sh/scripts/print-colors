@@ -1,0 +1,9 @@
+#! /usr/bin/env sh
+
+set -e
+
+for color in $(env | grep "^CLR" | sort); do
+	name=${color#*=}
+	value=${color%=*}
+	printf "%s%s${FORMAT_CLEAR}\n" "${name}" "${value}"
+done

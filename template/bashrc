@@ -1,0 +1,13 @@
+#! /usr/bin/env bash
+
+if [ -n "${NUMONIC_BASH:-}" ]; then
+	return
+fi
+
+printf "\n%s\n" "numonic: using bash shell"
+
+if [ -f "${HOME}"/.local/numonic/bash/bashrc ]; then
+	. "${HOME}"/.local/numonic/bash/bashrc
+fi
+
+NUMONIC_BASH=1

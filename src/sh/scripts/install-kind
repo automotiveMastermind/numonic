@@ -1,0 +1,68 @@
+#! /usr/bin/env sh
+
+set -e
+
+__numonic_kind_install() {
+
+	version="latest"
+
+	while :; do
+		case $1 in
+			-v|--version)
+				version="v${2#v*}"
+				shift
+				;;
+			-f|--force)
+				if [ -f "${NUMONIC_BIN}"/kind ]; then
+					rm -f "${NUMONIC_BIN}"/kind 1>/dev/null
+				fi
+				;;
+			--debug)
+				set -x
+				;;
+			?*)
+				print-fail "install-kind: invalid argument: $1"
+				exit 1
+				;;
+			*)
+				break
+				;;
+		esac
+		shift
+	done
+
+	# determine if kind is already available
+	if command -v kind 1>/dev/null 2>&1; then
+
+		# move on immediately
+		return
+	fi
+
+	platform=$(uname | tr "[:upper:]" "[:lower:]")
+	arch=$(uname -m)
+
+	if [ "${arch}" = "x86_64" ]; then
+		arch=amd64
+	fi
+
+	print-success "downloading kind..."
+
+	# download kind to bin
+	curl --fail \
+		--show-error \
+		--location \
+		--output "${NUMONIC_BIN}"/kind \
+		https://kind.sigs.k8s.io/dl/"${version}"/kind-"${platform}"-"${arch}"
+	chmod +x "${NUMONIC_BIN}"/kind
+
+	# setup tab completion
+	kind completion bash > "${BASH_COMPLETION_DIR}"/kind.inc
+	kind completion zsh > "${ZSH_COMPLETION_DIR}"/_kind
+
+	# shellcheck disable=SC2016
+	print-warn '' \
+		'install-kind: start a new shell to enable tab completion...' \
+		'exec $SHELL -l'
+}
+
+__numonic_kind_install "$@"

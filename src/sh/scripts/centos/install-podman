@@ -1,0 +1,32 @@
+#! /usr/bin/env sh
+
+set -e
+
+__numonic_install_podman() {
+	print-success 'installing podman, buildah, and skopeo...'
+
+	rpm --restore shadow-utils 2>/dev/null
+
+	if [ -n "${NUMONIC_CONTAINER:-}" ]; then
+		sudo dnf install -y podman buildah skopeo crun fuse-overlayfs --exclude container-selinux
+	else
+		sudo dnf install -y podman buildah skopeo crun
+	fi
+
+	if [ ! -d "/etc/containers" ]; then
+		sudo mkdir -p "/etc/containers"
+	fi
+
+	XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-${HOME}/.config}
+	CONTAINERS_HOME=${XDG_CONFIG_HOME}/containers
+
+	if [ ! -d "${CONTAINERS_HOME}" ]; then
+		mkdir -p "${CONTAINERS_HOME}"
+	fi
+
+	if command -v configure-podman 1>/dev/null 2>&1; then
+		configure-podman
+	fi
+}
+
+__numonic_install_podman

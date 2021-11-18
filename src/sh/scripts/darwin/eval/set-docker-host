@@ -1,0 +1,13 @@
+#! /usr/bin/env sh
+
+if ! command -v docker 1>/dev/null 2>&1 || [ -n "${DOCKER_HOST:-}" ]; then
+	return
+fi
+
+if command -v limactl 1>/dev/null 2>&1; then
+	limactl start podman 1>/dev/null 2>&1 || true
+fi
+
+if [ -r "${HOME}"/.lima/podman/user.sock ]; then
+	export DOCKER_HOST="unix://${HOME}/.lima/podman/user.sock"
+fi

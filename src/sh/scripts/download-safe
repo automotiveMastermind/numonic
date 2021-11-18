@@ -1,0 +1,50 @@
+#! /usr/bin/env sh
+
+__numonic_download_safe() {
+	url="$1"
+	destination="${2:-${url##*/}}"
+
+	# reset args and fail on http error
+	set -- --write-out '%{http_code}'
+
+	if [ -f "/run/secrets/GITHUB_TOKEN" ]; then
+		if [ "${url#*github}" != "${url}" ]; then
+			GITHUB_TOKEN=$(cat /run/secrets/GITHUB_TOKEN)
+			set -- "$@" --header "'Authorization: token ${GITHUB_TOKEN}'"
+		fi
+	fi
+
+	# set the args
+	set -- "$@" --silent --output "${destination}" --location "${url}"
+	print-warn "download-safe: attempting to download: ${url}"
+
+	attempts=0
+
+	# continue attempting for up to 3 requests
+	while [ $attempts -lt 3 ]; do
+		: $((attempts=attempts+1))
+
+		# get the status code
+		status_code=$(curl "$@")
+
+		# determine if the request was successful; if so, we're good to go
+		test "${status_code}" -eq 200 && return 0
+
+		# print a failure message
+		print-fail "download-safe: failed to download: ${url} after ${attempts} attempts with status code: ${status_code}"
+
+		# determine if the error is non-recoverable (404) and break
+		test "${status_code}" -eq 404 && break
+
+		# wait to retry
+		sleep 10
+	done
+
+	# we reached the end of the line
+	printf-fail "download-safe: failed to download: ${url}"
+
+	# return an error code
+	return 1
+}
+
+__numonic_download_safe "$@"

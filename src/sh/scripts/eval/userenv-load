@@ -1,0 +1,61 @@
+#! /usr/bin/env sh
+
+__numonic_userenv_load() {
+	__userenv_file="${HOME}"/.pam_environment
+
+	while :; do
+		case $1 in
+			--help)
+				man userenv-load
+				return 0
+				;;
+			-dr|--dry-run)
+				dry_run=1
+				;;
+			-f|--file)
+				__userenv_file="${2}"
+				shift
+				;;
+			--file=*)
+				__userenv_file="${1#*=}"
+				;;
+			*?)
+				print-fail "userenv-load: too many arguments, argument: ${1} is unexpected."
+				man userenv-load | cat 1>&2
+				return 1
+				;;
+			*)
+				break
+				;;
+		esac
+		shift
+	done
+
+	if [ ! -f "${__userenv_file}" ]; then
+		touch "${__userenv_file}"
+		return 0
+	fi
+
+	# get the variables
+	variables=$(xargs -L1 < "${__userenv_file}" | sed -e 's%^%export %')
+
+	# get the user path
+	PATH="$(userenv get USER_PATH 2>/dev/null):${PATH}"
+
+	# cleanup any duplicates
+	PATH=$(userenv get-path)
+
+	if [ -n "${dry_run:-}" ]; then
+		print-warn '' \
+			'VARIABLES' \
+			'' \
+			"${variables}" \
+			"export PATH=\"${PATH}\"" \
+		''
+
+		return 0
+	fi
+
+	eval "${variables}" 1>/dev/null
+    eval "$(export PATH="${PATH}")"
+}

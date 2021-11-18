@@ -1,0 +1,61 @@
+#! /usr/bin/env zsh
+
+# set shell
+export NUMONIC_SHELL="zsh"
+
+# history
+if [ -z "$HISTFILE" ]; then
+	HISTFILE="$HOME/.zsh_history"
+fi
+
+if [ "$HISTSIZE" -lt 50000 ]; then
+	HISTSIZE=50000
+fi
+
+if [ "$SAVEHIST" -lt 10000 ]; then
+	SAVEHIST=10000
+fi
+
+setopt extended_history
+setopt hist_expire_dups_first
+setopt hist_ignore_dups
+setopt hist_ignore_space
+setopt hist_verify
+setopt share_history
+
+# other shell options
+setopt cdable_vars
+setopt null_glob
+setopt combining_chars
+
+zsh_scripts_dir="${NUMONIC_HOME}/zsh/scripts"
+
+if [ "${PATH#*${zsh_scripts_dir}}" = "${PATH}" ]; then
+	# add scripts to path
+	export PATH="${zsh_scripts_dir}:${PATH}"
+fi
+
+# add completion dir to fpath
+fpath=("${ZSH_COMPLETION_DIR}" "${fpath[@]}")
+
+# load completion
+autoload -U +X compinit
+compinit
+
+# support bash completion
+autoload -U +X bashcompinit
+bashcompinit
+
+# evaluate eval scripts
+for eval_script in "${NUMONIC_HOME}"/zsh/scripts/eval/*; do
+	if [ ! -f "${eval_script}" ]; then
+		break
+	fi
+
+	. "$eval_script"
+done
+
+# test for user zshrc
+if [ -f "${NUMONIC_SHARE}"/zshrc ]; then
+	. "${NUMONIC_SHARE}"/zshrc
+fi

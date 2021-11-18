@@ -1,0 +1,86 @@
+#! /usr/bin/env sh
+
+set -e
+
+__numonic_theme_terminal() {
+	theme=
+
+	while :; do
+		case $1 in
+			-d|--debug)
+				debug=1
+				;;
+			-h|--help)
+				man theme-terminal
+				return 0
+				;;
+			-t|--theme)
+				theme="${2}"
+				shift
+				;;
+			--theme=*)
+				theme="${1#*=}"
+				;;
+			-q|--quiet)
+				quiet=1
+				;;
+			?*)
+				print-fail "theme-terminal: too many arguments, argument: ${1} is unexpected"
+				man theme-terminal | cat 1>&2
+				return 1
+				;;
+			*)
+				break
+				;;
+		esac
+		shift
+	done
+
+	(
+		if [ -n "${debug:-}" ]; then
+			set -x
+		fi
+
+		if [ -n "${quiet:-}" ]; then
+			exec 1>/dev/null
+		fi
+
+		theme="${theme-terminal:-numonic-dark}"
+
+		current_default=$(defaults read com.apple.Terminal "Default Window Settings")
+		current_startup=$(defaults read com.apple.Terminal "Startup Window Settings")
+
+		if [ "${theme}" = "${current_default:-}" ] && [ "${theme}" = "${current_startup}" ]; then
+			print-warn "theme-terminal: the requested theme ${theme} is already set."
+			return 1
+		fi
+
+		theme_file="${NUMONIC_HOME}"/themes/darwin/"${theme}".terminal
+
+		if [ ! -f "${theme_file}" ]; then
+			print-fail "theme-terminal: the theme ${theme} is not supported."
+			exit 1
+		fi
+
+		# disable the quarantine
+		xattr -d com.apple.quarantine "${theme_file}" 1>/dev/null 2>&1 || true
+
+		# let the user know we're defaulting the theme
+		print-success "theme-terminal: setting ${theme} as the default"
+
+		# open the theme
+		open "${theme_file}"
+
+		# set the theme as the startup
+		defaults write com.apple.Terminal "Startup Window Settings" -string "${theme}"
+		defaults import com.apple.Terminal "${HOME}/Library/Preferences/com.apple.Terminal.plist"
+
+		# set the theme as the default
+		defaults write com.apple.Terminal "Default Window Settings" -string "${theme}"
+		defaults import com.apple.Terminal "${HOME}/Library/Preferences/com.apple.Terminal.plist"
+
+		print-warn "theme-terminal: you can now close this window -- enjoy the theme!"
+	)
+}
+
+__numonic_theme_terminal "$@"

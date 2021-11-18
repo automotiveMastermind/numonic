@@ -1,0 +1,100 @@
+#! /usr/bin/env sh
+
+set -e
+
+__numonic_git_done() {
+	branch=
+	remote=
+
+	while :; do
+		case $1 in
+			--help)
+				man git-done
+				return 0
+				;;
+			-dr|--dry-run)
+				dry_run=1
+				;;
+			--debug)
+				debug=1
+				;;
+			--branch)
+				branch="$2"
+				shift
+				;;
+			--branch=*)
+				branch="${1#*=}"
+				;;
+			--remote)
+				remote="$2"
+				shift
+				;;
+			--remote=*)
+				remote="${1#*=}"
+				;;
+			?*)
+				if [ -z "${branch:-}" ]; then
+					branch="$1"
+				elif [ -z "${remote:-}" ]; then
+					remote="$1"
+				else
+					print-fail "git done: too many arguments, argument: ${1} is unexpected"
+					man git-done | cat 1>&2
+					return 1
+				fi
+				;;
+			*)
+				break
+				;;
+		esac
+		shift
+	done
+
+	if [ -z "${branch:-}" ]; then
+		branch="next"
+	fi
+
+	if [ -z "${remote:-}" ]; then
+		remote="origin"
+	fi
+
+	for current in "${branch}" develop next main master; do
+		if git show-ref --quiet --verify "refs/heads/${current}"; then
+			branch="${current}"
+			break
+		fi
+	done
+
+	print-warn '' \
+		'GIT DONE' \
+		"branch: ${branch}" \
+		"remote: ${remote}" \
+	''
+
+	if [ -n "${dry_run:-}" ]; then
+		return 0
+	fi
+
+	(
+		if [ -n "${debug:-}" ]; then
+			set -x
+		fi
+
+		# attempt to checkout the branch
+		git checkout "${branch}"
+
+		# update the branch
+		git-update
+
+		# delete merged branches
+		git-delete-merged --branch="${branch}"
+
+		# delete branches that don't exist on the remote
+		git-delete-gone --remote="${remote}"
+
+		# prune the remote
+		git-remote-prune --remote="${remote}"
+	)
+}
+
+__numonic_git_done "$@"

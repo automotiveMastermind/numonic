@@ -1,0 +1,21 @@
+#! /usr/bin/env sh
+
+__numonic_install_aws() {
+	brews='awscli aws-sam-cli'
+
+	brew tap aws/tap
+	brew update
+
+	for pkg in ${brews}; do
+		if brew list --versions "${pkg}" 1>/dev/null; then
+			print-success "install-aws: upgrading ${pkg}..."
+			brew upgrade "${pkg}" 2>/dev/null
+			brew link --overwrite "${pkg}" 2>/dev/null
+		else
+			print-success "install-aws: installing ${pkg}..."
+			brew install "${pkg}"
+		fi
+	done
+}
+
+__numonic_install_aws "$@"

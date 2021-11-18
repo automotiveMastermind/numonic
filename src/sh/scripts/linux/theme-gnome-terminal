@@ -1,0 +1,27 @@
+#! /usr/bin/env sh
+
+set -e
+
+if [ -z "${GNOME_TERMINAL_SERVICE:-}" ]; then
+	print-fail "themes are only supported for gnome terminal"
+	exit 1
+fi
+
+NUMONIC_THEME_NAME=${1:-"numonic-dark"}
+NUMONIC_THEME=${HOME}/.local/numonic/themes/linux/${NUMONIC_THEME_NAME}.theme
+
+if [ ! -f "${NUMONIC_THEME:-}" ]; then
+	print-fail "the theme ${NUMONIC_THEME_NAME} is not supported"
+	exit 1
+fi
+
+DEFAULT_PROFILE=$(dconf read /org/gnome/terminal/legacy/profiles:/default)
+DEFAULT_PROFILE=${DEFAULT_PROFILE:-$(gsettings get org.gnome.Terminal.ProfilesList default)}
+DEFAULT_PROFILE=${DEFAULT_PROFILE#\'}
+DEFAULT_PROFILE=${DEFAULT_PROFILE%\'}
+DEFAULT_PROFILE=${DEFAULT_PROFILE:-"b1dcc9dd-5262-4d8d-a863-c897e6d979b9"}
+
+# load the theme file
+dconf load "/org/gnome/terminal/legacy/profiles:/:${DEFAULT_PROFILE}/" < "${NUMONIC_THEME}"
+dconf write /org/gnome/terminal/legacy/profiles:/default "'${DEFAULT_PROFILE}'"
+gsettings set org.gnome.Terminal.ProfilesList default "'${DEFAULT_PROFILE}'"

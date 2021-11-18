@@ -1,0 +1,10 @@
+#! /usr/bin/env sh
+
+print-success 'installing dotnet prequisites...'
+sudo dnf update -y
+sudo dnf install -y \
+	ca-certificates \
+	\
+	krb5-libs \
+	libicu \
+	openssl-libs

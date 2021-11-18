@@ -1,0 +1,121 @@
+#! /usr/bin/env sh
+
+set -e
+
+__numonic_git_fork_clone() {
+
+	origin_url=
+
+	while :; do
+		case $1 in
+			--debug)
+				debug=1
+				;;
+			-dr|--dry-run)
+				dry_run=1
+				;;
+			--help)
+				man git-fork-clone
+				return 0
+				;;
+			--origin-url)
+				origin_url="${2}"
+				shift
+				;;
+			--origin-url=*)
+				origin_url="${1#*=}"
+				;;
+			--upstream-url)
+				upstream_url="${2}"
+				shift
+				;;
+			--upstream-url=*)
+				upstream_url="${1#*=}"
+				;;
+			?*)
+				if [ -z "${origin_url:-}" ]; then
+					origin_url="${1}"
+				else
+					print-fail "git fork-clone: too many arguments, argument: ${1} is unexpected"
+					man git-fork-clone | cat 1>&2
+				fi
+				;;
+			*)
+				break
+				;;
+		esac
+		shift
+	done
+
+	if [ -z "${origin_url}" ]; then
+		print-fail "git fork-clone: an origin url must be provided"
+		man git-fork-clone | cat 1>&2
+		return 1
+	fi
+
+	if [ "${origin_url#*'://'}" = "${origin_url}" ]; then
+		print-fail "git fork-clone: the origin url must start with ssh://, https://, or git://"
+		man git-fork-clone | cat 1>&2
+		return 1
+	fi
+
+	origin_org=${origin_url%/*}
+	origin_org=${origin_org%/_git}
+	origin_org=${origin_org##*/}
+	origin_repo=${origin_url##*/}
+	origin_alias=${origin_repo%%.*}
+
+	upstream_org=${2:-$(basename "${PWD}")}
+	upstream_repo=${origin_url##*/}
+	upstream_repo=${3:-${upstream_repo%%.*}}
+	upstream_alias=${upstream_repo}
+
+	suffix=
+
+	if [ "${origin_url%.git}" != "${origin_url}" ]; then
+		suffix=".git"
+		upstream_repo="${upstream_alias}${suffix}"
+	fi
+
+	upstream_url=$(printf '%s' "${origin_url}" | sed "s!${origin_org}!${upstream_org}!g")
+	upstream_url=$(printf '%s' "${upstream_url}" | sed "s!${origin_repo}!${upstream_repo}!g")
+
+	print-warn '' \
+		'GIT FORK CLONE' \
+		'ORIGIN' \
+		"    url          : ${origin_url}" \
+		"    organisation : ${origin_org}" \
+		"    repository   : ${origin_repo}" \
+		"    alias        : ${origin_alias}" \
+		'UPSTREAM' \
+		"    url          : ${upstream_url}" \
+		"    organisation : ${upstream_org}" \
+		"    repository   : ${upstream_repo}" \
+		"    alias        : ${upstream_alias}" \
+	''
+
+	if [ -n "${dry_run:-}" ]; then
+		return 0
+	fi
+
+	(
+		if [ -n "${debug:-}" ]; then
+			set -x
+		fi
+
+		# clone the origin using the alias
+		git clone "${origin_url}" "${origin_alias}" 1>/dev/null 2>&1
+		cd "${origin_alias}" 1>/dev/null 2>&1
+
+		# get the current default branch
+		branch=$(git rev-parse --abbrev-ref HEAD)
+
+		# add the remote for the upstream
+		git remote add upstream "${upstream_url}"
+
+		# remove any completed branches
+		git-fork-done --branch="${branch}" --remote=upstream
+	)
+}
+
+__numonic_git_fork_clone "$@"

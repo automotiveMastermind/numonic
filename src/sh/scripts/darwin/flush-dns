@@ -1,0 +1,34 @@
+#! /usr/bin/env sh
+
+__numonic_flush_dns() {
+	while :; do
+		case $1 in
+			--debug)
+				debug=1
+				;;
+			--help)
+				man flush-dns
+				return 0
+				;;
+			*?)
+				print-fail "flush-dns: unknown argument ${1}"
+				man flush-dns | cat 1>&2
+				return 1
+				;;
+			*)
+				break;
+		esac
+		shift
+	done
+
+	(
+		if [ -n "${debug:-}" ]; then
+			set -x
+		fi
+
+		dscacheutil -flushcache
+		sudo killall -HUP mDNSResponder
+	)
+}
+
+__numonic_flush_dns "$@"

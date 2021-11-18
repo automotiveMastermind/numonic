@@ -1,0 +1,61 @@
+.TH "USERENV-PREPEND" "1" "November 10, 2021" "Numonic v8.1.0" "Numonic
+Manual"
+.nh \" Turn off hyphenation by default.
+.SH NAME
+.PP
+userenv-prepend - prepends a value to the beginning of a variable within
+the user specific environment file
+.SH SYNOPSIS
+.PP
+\f[B]userenv prepend\f[R] <\f[I]key\f[R]> <\f[I]value\f[R]>
+[\f[B]--separator\f[R] <\f[I]separator\f[R]>] [\f[B]--help\f[R]]
+.PP
+\f[B]userenv prepend\f[R] <\f[I]key\f[R]>\f[B]=\f[R]<\f[I]value\f[R]>
+[\f[B]--separator=\f[R]<\f[I]separator\f[R]>] [\f[B]--help\f[R]]
+.SH DESCRIPTION
+.PP
+This command will prepend the specified value to the beginning of a
+variable within the user specific environment file, typically located at
+$HOME/.pam_environment.
+If the variable does not already exist, it will be created using the
+specified value.
+An optional separator can be defined.
+If the separator is not defined, then the value will be separated using
+a colon (:).
+.SH OPTIONS
+.SS <key>
+.PP
+the key (or name) of the environment variable to prepend
+.SS <value>
+.PP
+the value of the environment variable to prepend
+.SS --separator <separator>, --separator=<separator>
+.PP
+the separator to use when prepending the value
+.SS --help
+.PP
+print this help information
+.SH EXAMPLES
+.SS userenv prepend abc 123
+.SS userenv prepend abc=123
+.PP
+prepend a variable named abc with a value of 123 using the default colon
+as a separator
+.SS userenv prepend abc 123 --separator
+.SS userenv prepend abc=123 --separator=
+.PP
+prepend a variable named abc with the value of 123 using a comma as a
+separator
+.SH DEFAULTS
+.PP
+If the separator is not specified, the default will be the colon (:)
+character.
+For example if a value of 123 is prepended to an existing variable
+called my_var with a value of abc, then the result will be:
+my_var=abc:123 by default.
+.SH SEE ALSO
+.PP
+\f[B]userenv-append\f[R](1), \f[B]userenv-load\f[R](1),
+\f[B]pam_env\f[R](7)
+.SH AUTHORS
+Deavon M. McCaffery

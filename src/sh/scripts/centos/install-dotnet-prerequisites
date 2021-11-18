@@ -1,0 +1,13 @@
+#! /usr/bin/env sh
+
+set -e
+
+sudo=$(command -v sudo || printf '')
+yum=$(command -v dnf || command -v yum)
+
+"${sudo}" "${yum}" update -y
+"${sudo}" "${yum}" install -y \
+	ca-certificates \
+	krb5-libs \
+	libicu \
+	openssl-libs

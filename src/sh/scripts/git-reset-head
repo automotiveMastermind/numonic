@@ -1,0 +1,49 @@
+#! /usr/bin/env sh
+
+set -e
+
+__numonic_git_commit_reset_head() {
+	message="[RESET]"
+
+	while :; do
+		case $1 in
+			-d|--debug)
+				debug=1
+				;;
+			-h|--help)
+				man git-commit-reset-head
+				return 0
+				;;
+			-m|--message)
+				message="[RESET] ${2}"
+				shift
+				;;
+			--message=*)
+				message="[RESET] ${1#*=}"
+				;;
+			*?)
+				if [ "${message}" = "[REST]" ]; then
+					message="[RESET] ${1}"
+				else
+					print-fail "git reset-head: too many arguments, argument: ${1} is unexpected"
+					man git-commit-reset-head | cat 1>&2
+					return 1
+				fi
+				;;
+			*)
+				break;
+		esac
+		shift
+	done
+
+	(
+		if [ -n "${debug:-}" ]; then
+			set -x
+		fi
+
+		git commit --quiet --all --message "${message}"
+		git reset HEAD~1 --hard
+	)
+}
+
+__numonic_git_commit_reset_head "$@"

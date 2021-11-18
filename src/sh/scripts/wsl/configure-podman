@@ -1,0 +1,22 @@
+#! /usr/bin/env sh
+
+set -e
+
+__numonic_configure_podman() {
+
+	print-success "configure-podman: configuring podman for wsl..."
+	sudo tee /etc/containers/containers.conf 1>/dev/null 2>&1 <<- 'EOT'
+		[engine]
+		cgroup_manager="cgroupfs"
+		events_logger="file"
+	EOT
+
+	# todo: detect if this already exists across processes
+	if [ -z "${DOCKER_HOST:-}" ]; then
+
+		socket="unix://${XDG_RUNTIME_DIR}/podman/podman.sock"
+		podman system service --time 0 "${socket}" &
+
+		export DOCKER_HOST="${socket}"
+	fi
+}

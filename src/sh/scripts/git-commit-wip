@@ -1,0 +1,50 @@
+#! /usr/bin/env sh
+
+set -e
+
+__numonic_git_commit_wip() {
+	message="[WIP]"
+
+	while :; do
+		case $1 in
+			-d|--debug)
+				debug=1
+				;;
+			-h|--help)
+				man git-commit-wip
+				return 0
+				;;
+			-m|--message)
+				message="[WIP] ${2}"
+				shift
+				;;
+			--message=*)
+				message="[WIP] ${1#*=}"
+				;;
+			*?)
+				if [ "${message}" = "[WIP]" ]; then
+					message="[WIP] ${1}"
+				else
+					print-fail "git wip: too many arguments, argument: ${1} is unexpected"
+					man git-commit-wip | cat 1>&2
+					return 1
+				fi
+				;;
+			*)
+				break;
+		esac
+		shift
+	done
+
+	(
+		if [ -n "${debug:-}" ]; then
+			set -x
+		fi
+
+		git add --all
+		git commit --all --message "${message}"
+		git push origin HEAD
+	)
+}
+
+__numonic_git_commit_wip "$@"

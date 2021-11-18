@@ -1,0 +1,26 @@
+#! /usr/bin/env bash
+
+__numonic_set_window_title() {
+
+	# set the window title
+	printf "\033]0; %s \007" "${USER}@${HOSTNAME%%.*} -:- ${PWD##*/}"
+}
+
+# detect startship
+if command -v starship 1>/dev/null 2>&1; then
+
+	# set the starship configuration path
+	if [ -f "${NUMONIC_SHARE}/starship.toml" ]; then
+		export STARSHIP_CONFIG="${NUMONIC_SHARE}/starship.toml"
+	fi
+
+	# use starship instead of prompt command
+	eval "$(starship init bash)"
+
+	# set the window title
+	# shellcheck disable=SC2034
+	starship_precmd_user_func='__numonic_set_window_title'
+
+	# move on immediately
+	return
+fi

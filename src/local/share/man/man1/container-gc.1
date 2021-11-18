@@ -1,0 +1,49 @@
+.TH "CONTAINER-GC" "1" "November 10, 2021" "Numonic v8.1.0" "Numonic
+Manual"
+.nh \" Turn off hyphenation by default.
+.SH NAME
+.PP
+container-gc - garbage collects all stopped containers and dangling
+volumes and images for both podman and docker
+.SH SYNOPSIS
+.PP
+\f[B]container-gc\f[R] [\f[B]-d\f[R] | \f[B]--debug\f[R]] [\f[B]-h\f[R]
+| \f[B]--help\f[R]] [\f[B]-q\f[R] | \f[B]--quiet\f[R]]
+.SH DESCRIPTION
+.PP
+This command will prune all containers and dangling volumes and images
+for both podman and docker.
+At least one of these must be available on the \f[B]PATH\f[R] or the
+command will fail.
+If both are on the \f[B]PATH\f[R], then both will be pruned.
+.PP
+The command essentially performs the following where <command> is either
+\f[C]podman\f[R] or \f[C]docker\f[R]:
+.PP
+<command> container prune --force <command> volume prune --force
+<command> image prune --force
+.SH OPTIONS
+.SS FLAGS
+.SS -d, --debug
+.PP
+print the commands as they are executed (set -x)
+.SS -h, --help
+.PP
+print this help information
+.SS -q, --quiet
+.PP
+suppress any output to stdout (any errors will still be printed)
+.SH EXAMPLES
+.SS container-gc
+.PP
+garbage collect both docker and podman, if available
+.SS container-gc --debug
+.PP
+garbage collect both docker and podman, if available, while printing the
+commands as they are executed
+.SH SEE ALSO
+.PP
+\f[B]podman-container-prune\f[R](1) (https://docs.podman.io/en/latest/markdown/podman-container-prune.1.html),
+\f[B]sh\f[R](1) (https://man.openbsd.org/sh.1)
+.SH AUTHORS
+Deavon M. McCaffery

@@ -1,0 +1,68 @@
+#! /usr/bin/env sh
+
+set -e
+
+__numonic_git_delete_gone() {
+	remote=
+
+	while :; do
+		case $1 in
+			--help)
+				man git-remote-prune
+				return 0
+				;;
+			-dr|--dry-run)
+				dry_run=1
+				;;
+			--debug)
+				debug=1
+				;;
+			--remote)
+				remote="${2}"
+				shift
+				;;
+			--remote=*)
+				remote="${1#*=}"
+				;;
+			?*)
+				if [ -z "${remote:-}" ]; then
+					remote="${1}"
+				else
+					print-fail "git remote-prune: too many arguments, argument: ${1} is unexpected"
+					man git-remote-prune | cat 1>&2
+				fi
+				;;
+			*)
+				break
+				;;
+		esac
+		shift
+	done
+
+	if [ -z "${remote:-}" ]; then
+		remote="origin"
+	fi
+
+	print-warn '' \
+		'GIT DELETE GONE' \
+		"remote: ${remote}" \
+	''
+
+	if [ -n "${dry_run:-}" ]; then
+		return 0
+	fi
+
+	(
+		if [ -n "${debug:-}" ]; then
+			set -x
+		fi
+
+		git fetch --prune --prune-tags "${remote}"
+		git branch --verbose \
+			| grep 'gone]' \
+			| cut -d ' ' -f 3 \
+			| xargs git branch --delete --force 2>/dev/null
+	)
+}
+
+__numonic_git_delete_gone "$@"

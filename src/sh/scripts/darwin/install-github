@@ -1,0 +1,16 @@
+#! /usr/bin/env sh
+
+__numonic_install_github() {
+
+	# determine if github is already available
+	if command -v github 1>/dev/null 2>&1; then
+
+		# move on immediately
+		return
+	fi
+
+	print-success 'install-github: installing cli...'
+	brew install github
+}
+
+__numonic_install_github "$@"

@@ -1,0 +1,41 @@
+---
+man_name: numonic-bash
+man_section: 7
+---
+
+# NAME
+
+numonic-bash - an explanation of the well-known configuration and shell-specific commands for using numonic with bash
+
+# SYNOPSIS
+
+numonic-bash
+
+# DESCRIPTION
+
+Numonic strives to fully support both bash and zsh. As such there are very few commands that are available in only one
+shell, which are mostly related to the specific implementation of the startup/shutdown files for the shell in question.
+
+# CONFIGURATION
+
+Numonic will always take ownership of and overwrite the default user startup/shutdown files. This is intended to ensure
+successful update paths and compatibility across the board. There is, however, full support for user-specific overrides,
+which are always loaded *after* the default files.
+
+For bash, the following files are owned by numonic and cannot be modified by the user as these files will be
+overwritten on every update:
+
+\$HOME/.bash_profile
+\$HOME/.bashrc
+\$HOME/.bash_completion
+
+To override any of the default configuration included by these files, please use the following location:
+
+\$HOME/.local/share/bashrc
+
+The **edit-bashrc** command will automatically create this file if does not already exist and open the file in the
+default editor.
+
+# SEE ALSO
+
+[**edit-bashrc**(1)](edit-bashrc)

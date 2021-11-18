@@ -1,0 +1,25 @@
+#! /usr/bin/env bash
+
+__numonic_source_os() {
+
+	# detect platform
+	unames=$(print-unames)
+
+	for current in ${unames}; do
+		uname_path="${NUMONIC_HOME}/bash/scripts/${current}"
+
+		if [ ! -d "${uname_path}" ]; then
+			continue
+		fi
+
+		export PATH="${uname_path}:${PATH}"
+
+		if [ -d "${uname_path}/eval" ]; then
+			for eval_script in "${uname_path}"/eval/*; do
+				. "${eval_script}"
+			done
+		fi
+	done
+}
+
+__numonic_source_os

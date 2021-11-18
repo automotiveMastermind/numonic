@@ -1,0 +1,82 @@
+#! /usr/bin/env sh
+
+set -e
+
+__numonic_theme_vscode() {
+	theme=
+
+	while :; do
+		case $1 in
+			-d|--debug)
+				debug=1
+				;;
+			-h|--help)
+				man theme-vscode
+				return 0
+				;;
+			-t|--theme)
+				theme="${2}"
+				shift
+				;;
+			--theme=*)
+				theme="${1#*=}"
+				;;
+			-q|--quiet)
+				quiet=1
+				;;
+			?*)
+				print-fail "theme-vscode: too many arguments, argument: ${1} is unexpected"
+				man theme-vscode | cat 1>&2
+				return 1
+				;;
+			*)
+				break
+				;;
+		esac
+		shift
+	done
+
+	(
+		if [ -n "${debug:-}" ]; then
+			set -x
+		fi
+
+		if [ -n "${quiet:-}" ]; then
+			exec 1>/dev/null
+		fi
+
+		theme="${theme-terminal:-numonic-dark}"
+
+		if command -v code 1>/dev/null 2>&1; then
+			code_app=$(readlink "$(command -v code)")
+			code_app="${code_app%.app*}.app"
+
+			print-warn '' \
+				'theme-vscode: we would like to install the following extensions to enable the theme:' \
+				'' \
+				'teabyii.ayu - a collection of themes that closely match our chosen colours with over 1M installs' \
+				'	https://marketplace.visualstudio.com/items?itemName=teabyii.ayu' \
+				'' \
+				'miguelsolorio.fluent-icons - a collection of simple but beautiful product icons with over 200K installs' \
+				'	https://marketplace.visualstudio.com/items?itemName=miguelsolorio.fluent-icons' \
+				''
+		set -- "$(locale LC_MESSAGES)"
+
+		yes_expr="${1}"
+		no_expr="${2}"
+		yes_word="${3}"
+		no_word="${4}"
+
+
+		elif [ -d "/Applications/Visual Studio Code.app" ]; then
+			code_app="/Applications/Visual Studio Code.app"
+		elif [ -d "${HOME}/Applications/Visual Studio Code.app" ]; then
+			code_app="${HOME}/Applications/Visual Studio Code.app"
+		else
+			print-fail "theme-vscode: Visual Studio Code could not be found."
+			return 1
+		fi
+	)
+}
+
+__numonic_theme_vscode "$@"

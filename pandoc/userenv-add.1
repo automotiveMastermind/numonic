@@ -1,0 +1,76 @@
+---
+title: userenv-add
+man_title: USERENV-ADD
+man_section: 1
+man_header: Numonic Manual
+man_footer: Numonic v8.1.0
+revision_date: November 10, 2021
+hyphenate: false
+authors:
+  - Deavon M. McCaffery
+---
+
+---
+title: userenv-add
+---
+
+# NAME
+
+userenv-add - adds a new variable to the user specific environment file
+
+# SYNOPSIS
+
+**userenv add** <*key*> <*value*> [**-f** <*file*>] [**-h** | **--help**]
+
+**userenv add** <*key*>**=**<*value*> [**--file=**<*file*>] [**-h** | **--help**]
+
+## DESCRIPTION
+
+This command adds a new variable to the user specific environment file, typically located at $HOME/.pam_environment. If
+the variable already exists, then the command will fail. To set or add an existing variable, use **userenv set**. To
+update a variable if and only if it already exists, use **userenv replace**.
+
+Once the new variable is added, the environment will be loaded to ensure that the new variable is available within the
+current shell session.
+
+# OPTIONS
+
+## \<key\>
+
+the key (or name) of the environment variable to add
+
+## \<value\>
+
+the value of the environment variable to add
+
+## -f \<file\>, --file=\<file\>
+
+the path of the environment file to read and write
+DEFAULT: $HOME/.pam_environment
+
+## -h, --help
+
+print this help information
+
+# DEFAULTS
+
+If no file is specified, then the default user specific environment file location of $HOME/.pam_environment will be
+used.
+
+# EXAMPLES
+
+## userenv add abc 123
+
+## userenv add abc=123
+
+add a variable named abc with a value of 123
+
+## userenv add abc 123 -f ~/my-variables
+
+## userenv add abc=123 --file=~/my-variables
+
+add a variable named abc with a value of 123 to the specified file ($HOME/my-variables)
+
+# SEE ALSO
+
+**userenv-set**(1), **userenv-edit**(1), **userenv-replace**(1), **userenv-get**(1), **userenv-load**(1), **pam_env**(7)

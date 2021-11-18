@@ -1,0 +1,17 @@
+#! /usr/bin/env bash
+
+if command -v kubectl 1>/dev/null 2>&1; then
+	. <(kubectl completion bash)
+fi
+
+if command -v helm 1>/dev/null 2>&1; then
+	. <(helm completion bash)
+fi
+
+if command -v npm 1>/dev/null 2>&1; then
+	. <(npm completion)
+fi
+
+if command -v terraform 1>/dev/null 2>&1; then
+	complete -C "$(command -v terraform)" terraform
+fi

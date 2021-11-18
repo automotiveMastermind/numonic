@@ -1,0 +1,99 @@
+[aws]
+format = 'on [$symbol($region)]($style) '
+symbol = ' '
+
+[battery]
+full_symbol        = ' '
+charging_symbol    = ' '
+discharging_symbol = ' '
+
+[character]
+error_symbol   = '[->](bold red)'
+success_symbol = '[->](bold green)'
+
+[conda]
+symbol = ' '
+
+[dart]
+symbol = ' '
+
+[directory]
+read_only = ' '
+
+[docker_context]
+symbol = ' '
+
+[elixir]
+symbol = ' '
+
+[elm]
+symbol = ' '
+
+[gcloud]
+format = 'on [$symbol($region)]($style) '
+symbol = ' '
+
+[git_branch]
+symbol = ' '
+
+[git_status]
+format   = '([\[ $all_status$ahead_behind\]]($style) )'
+ahead    = '([⇡$count](bold yellow) )'
+behind   = '([⇣$count](bold red) )'
+stashed  = '([\$$count](bold white) )'
+modified = '([!$count](bold yellow) )'
+staged   = '([+$count](bold green) )'
+renamed  = '([»$count](bold yellow) )'
+deleted  = '([✘$count](bold red) )'
+diverged = '([⇡$ahead_count⇣$behind_count](bold yellow) )'
+
+[golang]
+symbol = ' '
+
+[hg_branch]
+symbol = ' '
+
+[java]
+symbol = ' '
+
+[julia]
+symbol = ' '
+
+[kubernetes]
+symbol   = 'ﴱ '
+disabled = false
+
+[memory_usage]
+symbol = ' '
+
+[nim]
+symbol = ' '
+
+[nix_shell]
+symbol = ' '
+
+[nodejs]
+symbol = ' '
+
+[package]
+symbol = ' '
+
+[perl]
+symbol = ' '
+
+[php]
+symbol = ' '
+
+[python]
+python_binary = 'python3'
+style         = 'green bold'
+symbol        = ' '
+
+[ruby]
+symbol = ' '
+
+[rust]
+symbol = ' '
+
+[swift]
+symbol = 'ﯣ '

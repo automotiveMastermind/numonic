@@ -1,0 +1,39 @@
+#! /usr/bin/env bash
+
+__numonic_edit_bashrc() {
+	while :; do
+		case $1 in
+			-d|--debug)
+				debug=1
+				;;
+			-h|--help)
+				man git edit-bashrc
+				return 0
+				;;
+			*?)
+				print-fail "edit-bashrc: unknown argument ${1}"
+				man edit-bashrc | cat 1>&2
+				return 1
+				;;
+			*)
+				break;
+		esac
+		shift
+	done
+
+	(
+		if [ -n "${debug:-}" ]; then
+			set -x
+		fi
+
+		bashrc_path="${NUMONIC_SHARE}/bashrc"
+
+		if [ ! -f "${bashrc_path}" ]; then
+			printf "%s\n\n" "#! /usr/bin/env bash" > "${bashrc_path}"
+		fi
+
+		${EDITOR:-vi} "${bashrc_path}"
+	)
+}
+
+__numonic_edit_bashrc "$@"

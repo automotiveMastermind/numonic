@@ -1,0 +1,121 @@
+#! /usr/bin/env sh
+
+set -e
+
+__numonic_install_gcloud() {
+	install_dir="${NUMONIC_SHARE}"/gcloud
+
+	while :; do
+		case $1 in
+			-d|--debug)
+				debug=1
+				;;
+			-h|--help)
+				man install-gcloud
+				return 0
+				;;
+			-f|--force)
+				if [ -d "${HOME}"/.gcloud ]; then
+					rm -rf "${HOME}"/.gcloud 1>/dev/null
+				fi
+
+				if [ -d "${HOME}"/gcloud ]; then
+					rm -rf "${HOME}"/gcloud 1>/ev/null
+				fi
+
+				if [ -d "${NUMONIC_SHARE}"/gcloud ]; then
+					rm -rf "${NUMONIC_SHARE}"/gcloud 1>/dev/null
+				fi
+
+				if command -v gcloud 1>/dev/null 2>&1; then
+					print-fail "install-gcloud: gcloud is already on the path at: $(command -v gcloud)" \
+						'This version was not installed using numonic.' \
+						'Please remove using the package manager that was used to install it.'
+					return 1
+				fi
+				;;
+			?*)
+				print-fail "install-gcloud: too many arguments, argument: ${1} is unexpected"
+				man install-gcloud | cat 1>&2
+				return 1
+				;;
+			*)
+				break
+				;;
+		esac
+		shift
+	done
+
+	if command -v gcloud 1>/dev/null 2>&1; then
+		print-warn "install-gcloud: gcloud is already on the path at: $(command -v gcloud)" \
+			'to reinstall, use the --force flag'
+		man install-gcloud | cat 1>&2
+		return 1
+	fi
+
+	print-success 'install-gcloud: installing gcloud-sdk...'
+
+	(
+		if [ "${debug:-}" ]; then
+			set -x
+		fi
+
+		temp=$(mktemp -d)
+
+		download-safe \
+			'https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.tar.gz' \
+			"${temp}"/gcloud.tar.gz
+
+		if [ ! -d "${install_dir}" ]; then
+			# create the output directory
+			mkdir -p "${install_dir}" 1>/dev/null
+		fi
+
+		# extract the executable
+		tar --extract \
+			--gzip \
+			--strip-components=1 \
+			--file="${temp}"/gcloud.tar.gz \
+			--directory="${install_dir}" 1>/dev/null
+
+		# remove the temp directory
+		rm --recursive --force "${temp}"
+
+		"${install_dir}"/install.sh \
+			--command-completion false \
+			--usage-reporting false \
+			--quiet \
+			--path-update false \
+			--additional-components kubectl gsutil core 2>&1
+
+		# symlink gcloud
+		ln -fs "${install_dir}"/bin/gcloud "${NUMONIC_BIN}"
+
+		# setup completion
+		if [ -f "${install_dir}"/completion.bash.inc ]; then
+			ln -fs \
+				"${install_dir}"/completion.bash.inc \
+				"${BASH_COMPLETION_DIR}"/gcloud.inc
+		fi
+
+		if [ -f "${install_dir}"/completion.zsh.inc ]; then
+			ln -fs \
+				"${install_dir}"/completion.zsh.inc \
+				"${ZSH_COMPLETION_DIR}"/_gcloud
+		fi
+	)
+
+	# initialise gcloud
+	gcloud init
+
+	# shellcheck disable=SC2016
+	print-warn '' \
+		'install-gcloud: start a new shell to enable tab completion...' \
+		'exec $SHELL -l'
+
+	. import-userenv
+	userenv set GOOGLE_CLOUD_SDK_PATH="${install_dir}" 1>/dev/null 2>&1
+	userenv prepend-path "${install_dir}/bin" 1>/dev/null 2>&1 || true
+}
+
+__numonic_install_gcloud "$@"

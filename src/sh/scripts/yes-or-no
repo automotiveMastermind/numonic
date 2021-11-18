@@ -1,0 +1,30 @@
+#! /usr/bin/env sh
+
+__numonic_yes_or_no() {
+
+	if [ -z "${1}" ]; then
+		print-fail "yes-or-no: we don't know what to ask, but we're sure the answer is 42!"
+		man yes-or-no | cat 1>&2
+		return 1
+	fi
+
+	newline=$(printf '\n')
+
+	IFS=$(printf '\n') printf "${CLR_MAGENTA}%s" "$*"
+	printf "?${CLR_BRIGHT_MAGENTA} %s ${FORMAT_CLEAR}" "[Yn]:"
+
+	stty_old=$(stty -g)
+	stty raw -echo
+	response=$( while ! head -c 1 | grep -i '[yn\s]'; do true; done )
+
+	# shellcheck disable=SC2086
+	stty ${stty_old}
+
+	if [ "${response}" = 'n' ] || [ "${response}" = 'N' ]; then
+		return 1
+	fi
+
+	return 0
+}
+
+__numonic_yes_or_no "$@"

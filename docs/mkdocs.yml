@@ -1,0 +1,101 @@
+site_name: numonic
+site_url: https://numonic.sh
+docs_dir: !ENV [CHANNEL_DOCS_DIR, "docs"]
+repo_url: https://github.com/automotivemastermind/numonic
+repo_name: am/numonic
+edit_uri: edit/main/docs/content
+copyright: Copyright &copy; 2021. automotiveMastermind and contributors.
+use_directory_urls: true
+docs_dir: ./docs/content
+site_dir: ./docs/site
+
+theme:
+  name: material
+  custom_dir: docs/theme
+  favicon: img/favicon.ico
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.indexes
+    - navigation.top
+    - navigation.tracking
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.annotate
+    - content.tabs.link
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: purple
+      accent: purple
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: purple
+      accent: purple
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+
+extra_javascript:
+  - https://cdnjs.cloudflare.com/ajax/libs/tablesort/5.2.1/tablesort.min.js
+  - assets/tables.js
+
+markdown_extensions:
+  - plantuml_markdown:
+      server: http://www.plantuml.com/plantuml
+      base_dir: ./docs/content
+      format: svg
+      priority: 100
+  - toc:
+      slugify: !!python/name:pymdownx.slugs.uslugify
+      permalink: true
+  - admonition
+  - meta
+  - smarty:
+      smart_quotes: false
+  - pymdownx.betterem
+  - attr_list
+  - def_list
+  - tables
+  - abbr
+  - footnotes
+  - md_in_html
+  - pymdownx.superfences:
+      preserve_tabs: true
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight:
+      linenums_style: pymdownx-inline
+  - pymdownx.inlinehilite
+  - pymdownx.tilde
+  - pymdownx.caret
+  - pymdownx.critic
+  - pymdownx.smartsymbols
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.escapeall:
+      hardbreak: True
+      nbsp: True
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.mark
+  - pymdownx.striphtml
+  - pymdownx.snippets:
+      base_path: ./docs/content
+  - pymdownx.keys:
+      separator: "\uff0b"
+  - pymdownx.details
+  - pymdownx.tabbed
+  - pymdownx.saneheaders
+
+plugins:
+  - search
+  - awesome-pages

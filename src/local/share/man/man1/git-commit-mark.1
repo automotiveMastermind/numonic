@@ -1,0 +1,49 @@
+.TH "GIT-COMMIT-MARK" "1" "November 10, 2021" "Numonic v8.1.0" "Numonic
+Manual"
+.nh \" Turn off hyphenation by default.
+.SH NAME
+.PP
+git-commit-mark - create a new empty marker commit
+.SH SYNOPSIS
+.PP
+\f[B]git\f[R] \f[B]commit-mark\f[R] <message> [\f[B]-d\f[R] |
+\f[B]--debug\f[R]] [\f[B]-h\f[R] | \f[B]--help\f[R]]
+.PP
+\f[B]git\f[R] \f[B]commit-mark\f[R] \f[B]-m\f[R] <message> [\f[B]-d\f[R]
+| \f[B]--debug\f[R]] [\f[B]-h\f[R] | \f[B]--help\f[R]]
+.PP
+\f[B]git\f[R] \f[B]commit-mark\f[R] \f[B]--message=\f[R]<message>
+[\f[B]-d\f[R] | \f[B]--debug\f[R]] [\f[B]-h\f[R] | \f[B]--help\f[R]]
+.SH DESCRIPTION
+.PP
+This command creates a new empty marker commit with a prefix of
+\f[B][MARK]\f[R] for the subject.
+This is useful for marking the HEAD of a rebase to easily identify the
+target commit for a future squash.
+A marked commit is only retained locally.
+.SH OPTIONS
+.SS <message>, -m <message>, --message=<message>
+.PP
+the message to include in the marker commit
+.SS -h, --help
+.PP
+print this help information
+.SS -d, --debug
+.PP
+print the commands as they are executed (set -x)
+.SH EXAMPLES
+.SS git commit-mark
+.PP
+create an empty marker commit with a subject of: \f[B][MARK]\f[R]
+.SS git commit-mark -d \[aq]some message\[aq]
+.SS git commit-mark --debug \[aq]some message\[aq]
+.PP
+create an empty marker commit with a subject of: \f[B][MARK] some
+message\f[R] while printing the commands as they are executed
+.SH SEE ALSO
+.PP
+\f[B]git-commit-save\f[R](1), \f[B]git-commit-wip\f[R](1),
+\f[B]git-commit-restore\f[R](1), \f[B]git-commit-undo\f[R](1),
+\f[B]git-commit\f[R](1)
+.SH AUTHORS
+Deavon M. McCaffery

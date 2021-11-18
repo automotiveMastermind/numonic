@@ -1,0 +1,10 @@
+#! /usr/bin/env sh
+
+# load all user scripts
+for eval_script in "${NUMONIC_HOME}"/sh/scripts/eval/userenv*; do
+	if [ ! -f "${eval_script}" ]; then
+		break
+	fi
+
+	. "${eval_script}"
+done

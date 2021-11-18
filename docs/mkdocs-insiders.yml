@@ -1,0 +1,19 @@
+INHERIT: ./mkdocs.yml
+
+plugins:
+  - search
+  - awesome-pages
+  - tags
+  - git-revision-date-localized:
+      type: timeago
+      fallback_to_build_date: true
+      enable_creation_date: true
+  - minify:
+      minify_html: true
+
+extra:
+  generator: false
+
+  version:
+    default: main
+    provider: mike

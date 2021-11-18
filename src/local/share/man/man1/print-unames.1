@@ -1,0 +1,59 @@
+.TH "PRINT-UNAMES" "1" "November 10, 2021" "Numonic v8.1.0" "Numonic
+Manual"
+.nh \" Turn off hyphenation by default.
+.SH NAME
+.PP
+print-unames - prints a list of compatible unix names for the current
+platform from most specific to least specific
+.SH SYNOPSIS
+.PP
+\f[B]print-unames\f[R]
+.SH DESCRIPTION
+.PP
+This command uses information from the \f[C]/etc/os-release\f[R] file,
+if available, along with the \f[B]uname\f[R] command to determine the
+current operating system id.
+This is then expanded to include less-specific compatible unix name
+identifiers.
+.PP
+When processing the \f[C]/etc/os-release\f[R] file, the \f[C]ID\f[R] and
+\f[C]ID_LIKE\f[R] variables are used.
+Special handling is then implemented for fedora to include centos in the
+id list as well as linuxmint to include debian.
+.PP
+Windows Subsystem for Linux (WSL) is also detected and included as an
+id.
+.PP
+The following is a list of expected outputs for various platforms:
+.TP
+\f[B]\f[CB]macOS\f[B]\f[R]
+darwin
+.TP
+\f[B]\f[CB]ubuntu\f[B]\f[R]
+ubuntu debian linux
+.TP
+\f[B]\f[CB]debian\f[B]\f[R]
+debian linux
+.TP
+\f[B]\f[CB]centos\f[B]\f[R]
+centos linux
+.TP
+\f[B]\f[CB]fedora\f[B]\f[R]
+fedora centos linux
+.TP
+\f[B]\f[CB]linuxmint\f[B]\f[R]
+linuxmint debian linux
+.TP
+\f[B]\f[CB]ubuntu (wsl)\f[B]\f[R]
+wsl ubuntu debian linux
+.SH EXAMPLES
+.SS print-unames
+.PP
+print the list of compatible unix names from most specific to least
+specific
+.SH SEE ALSO
+.PP
+\f[B]print-colors\f[R](1), \f[B]print-success\f[R](1),
+\f[B]print-warn\f[R](1), \f[B]print-fail\f[R](1)
+.SH AUTHORS
+Deavon M. McCaffery; Not Committed Yet

@@ -1,0 +1,111 @@
+#! /usr/bin/env sh
+
+set -e
+
+__numonic_update()
+{
+	GITHUB_TOKEN=${GITHUB_TOKEN:-}
+	NUMONIC_TOKEN=${NUMONIC_TOKEN:-}
+	NUMONIC_TOKEN=${NUMONIC_TOKEN:-${GITHUB_TOKEN}}
+	NUMONIC_COMMIT_REF=${NUMONIC_COMMIT_REF:-"master"}
+	NUMONIC_SHELL=${NUMONIC_SHELL:-"bash"}
+	NUMONIC_DRY_RUN=${NUMONIC_DRY_RUN:-}
+
+	while :; do
+		case $1 in
+			-t|--token)
+				NUMONIC_TOKEN=$2
+				shift
+				;;
+			-v|--version)
+				NUMONIC_COMMIT_REF=$2
+				shift
+				;;
+			-dr|--dry-run)
+				NUMONIC_DRY_RUN=1
+				;;
+			-f|--force)
+				rm -rf "${HOME}/.local/numonic/.sha" 1>/dev/null 2>&1
+				;;
+			--debug)
+				set -x
+				;;
+			?*)
+				NUMONIC_SHELL=$1
+				;;
+			*)
+				break
+				;;
+		esac
+		shift
+	done
+
+	# set the arguments to the curl options
+	set -- --silent --write-out '%{http_code}'
+
+	# detect if a token is specified
+	if [ -n "${NUMONIC_TOKEN:-}" ]; then
+
+		# append the token header
+		set -- "$@" --header "'Authorization: token ${NUMONIC_TOKEN}'"
+	fi
+
+	NUMONIC_COMMIT_JSON=$(mktemp)
+	set -- "$@" --output "${NUMONIC_COMMIT_JSON}" --location "https://api.github.com/repos/automotiveMastermind/numonic/commits/${NUMONIC_COMMIT_REF}"
+
+	status_code=$(curl "$@")
+
+	test "${status_code}" -eq 200 && return 0
+
+	# detect if sha could be located
+	if [ -z "${NUMONIC_SHA:-}" ]; then
+		print-fail "numonic: cannot retrieve SHA of latest version. Are you connected to the internet?"
+		return 1
+	fi
+
+	NUMONIC_SHA_PATH=${HOME}/.local/numonic/.sha
+
+	# detect if sha file exists
+	if [ -f "${NUMONIC_SHA_PATH}" ]; then
+
+		# get the value of the sha file
+		NUMONIC_CURRENT_SHA=$(cat "${NUMONIC_SHA_PATH}")
+
+		# print latest version already installed
+		if [ "${NUMONIC_SHA}" = "${NUMONIC_CURRENT_SHA}" ]; then
+			print-success \
+				"numonic: latest version already installed:" \
+				"- run update-numonic with the --force flag to reinstall"
+			return
+		fi
+	fi
+
+	if [ -n "${NUMONIC_DRY_RUN:-}" ]; then
+		print-warn '' \
+			"update-numonic: a new version of prompt is available: ${NUMONIC_SHA}" \
+			'run the update-numonic command line tool to upgrade' \
+		''
+		return 0
+	fi
+
+	NUMONIC_INSTALL_URI="https://github.com/automotiveMastermind/numonic/archive/${NUMONIC_COMMIT_REF}.tar.gz"
+	NUMONIC_INSTALL_TEMP=$(mktemp -d)
+
+	curl --fail \
+		--silent \
+		--show-error \
+		--location \
+		--output "${NUMONIC_INSTALL_TEMP}/numonic.tgz" \
+		"${NUMONIC_INSTALL_URI}"
+	tar --extract \
+		--gzip \
+		--strip-components=1 \
+		--file="${NUMONIC_INSTALL_TEMP}/numonic.tgz" \
+		--directory="${NUMONIC_INSTALL_TEMP}"
+
+	"${NUMONIC_INSTALL_TEMP}/install.sh" "${NUMONIC_SHELL}" "${NUMONIC_INSTALL_TEMP}"
+}
+
+trap 'print-warn "numonic: terminating update..."; exit 1;' INT
+
+__numonic_update "$@"

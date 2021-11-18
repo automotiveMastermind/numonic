@@ -1,0 +1,91 @@
+#! /usr/bin/env sh
+
+set -e
+
+__numonic_install_aws() {
+	install_dir="${NUMONIC_SHARE}"/aws
+
+	while :; do
+		case $1 in
+			-d|--debug)
+				debug=1
+				;;
+			-h|--help)
+				man install-aws
+				return 0
+				;;
+			-f|--force)
+				if [ -d "${install_dir}" ]; then
+					rm -rf "${install_dir}" 1>/dev/null
+				fi
+
+				if command -v aws 1>/dev/null 2>&1; then
+					print-fail "install-aws: aws is already on the path at: $(command -v aws)" \
+						'This version was not installed using numonic.' \
+						'Please remove using the package manager that was used to install it.'
+					return 1
+				fi
+				;;
+			?*)
+				print-fail "install-aws: too many arguments, argument: ${1} is unexpected"
+				man install-aws | cat 1>&2
+				return 1
+				;;
+			*)
+				break
+				;;
+		esac
+		shift
+	done
+
+	if command -v aws 1>/dev/null 2>&1; then
+		print-warn "install-aws: aws is already on the path at: $(command -v aws)" \
+			'to reinstall, use the --force flag'
+		man install-aws | cat 1>&2
+		return 1
+	fi
+
+	print-success 'install-aws: installing aws-sdk...'
+
+	(
+		if [ "${debug:-}" ]; then
+			set -x
+		fi
+
+		temp=$(mktemp -d)
+		platform=$(uname | tr "[:upper:]" "[:lower:]")
+		arch=$(uname -m)
+
+		print-success "install-aws: downloading aws-sdk..."
+		download-safe "https://awscli.amazonaws.com/awscli-exe-${platform}-${arch}.zip" "${temp}"/aws.zip
+
+		# extract the contents
+		(cd "${temp}" && unzip aws.zip 1>/dev/null 2>&1)
+
+		# run the installer
+		print-success "install-aws: installing aws-sdk..."
+		"${temp}"/aws/install --install-dir "${install_dir}" --bin-dir "${NUMONIC_BIN}"
+
+		# setup completion
+		if command -v aws_completer 1>/dev/null 2>&1; then
+			cat <<- 'EOF' > "${install_dir}"/aws.completion.inc
+				complete -C 'aws_completer' aws
+			EOF
+
+			ln -fs "${install_dir}"/aws.completion.inc "${BASH_COMPLETION_DIR}"/aws.inc
+			ln -fs "${install_dir}"/aws.completion.inc "${ZSH_COMPLETION_DIR}"/_aws
+		fi
+	)
+
+	# shellcheck disable=SC2016
+	print-warn '' \
+		'install-aws: start a new shell to enable tab completion...' \
+		'exec $SHELL -l' \
+	''
+
+	. import-userenv
+	userenv set AWS_CLI_PATH="${install_dir}" 1>/dev/null 2>&1
+	userenv prepend-path "${install_dir}/bin" 1>/dev/null 2>&1 || true
+}
+
+__numonic_install_aws "$@"

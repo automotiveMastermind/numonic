@@ -1,0 +1,142 @@
+#! /usr/bin/env sh
+
+set -e
+
+__numonic_install_golang() {
+	version=
+	architecture=
+
+	GOROOT="${NUMONIC_SHARE}/go"
+	GOPATH="${HOME}/go"
+	GOBIN="${GOPATH}/bin"
+
+	while :; do
+		case $1 in
+			-d|--debug)
+				debug=1
+				;;
+			-h|--help)
+				man install-golang
+				return 0
+				;;
+			-v|--version)
+				version=$2
+				shift
+				;;
+			--version=*)
+				version="${1#*=}"
+				;;
+			-f|--force)
+				if [ -d "${HOME}"/go ]; then
+					rm -rf "${HOME}"/go 1>/dev/null
+				fi
+
+				if [ -d "${HOME}"/.go ]; then
+					rm -rf "${HOME}"/.go 1>/dev/null
+				fi
+
+				if [ -d "${GOROOT}" ]; then
+					rm -rf "${GOROOT}" 1>/dev/null
+				fi
+
+				if command -v go 1>/dev/null 2>&1; then
+					print-fail "install-golang: go is already on the path at: $(command -v go)" \
+						'This version was not installed using numonic.' \
+						'Please remove using the package manager that was used to install it.'
+					return 1
+				fi
+				;;
+			?*)
+				print-fail "install-golang: invalid argument: $1"
+				man install-golang | cat 1>&2
+				return 1
+				;;
+			*)
+				break
+				;;
+		esac
+		shift
+	done
+
+	(
+		if [ -n "${debug:-}" ]; then
+			set -x
+		fi
+
+		if command -v go 1>/dev/null 2>&1; then
+			if [ -z "${version:-}" ]; then
+				print-warn "install-golang: golang is already on the path at: $(command -v go)"
+				print-warn 'install-golang: to reinstall, use the --force flag'
+				return 1
+			fi
+
+			print-success "intall-golang: installing golang v${version}..."
+			go install golang.org/dl/go"${version}"@latest
+			return 0
+		fi
+
+		temp=$(mktemp -d)
+
+		download-safe "https://golang.org/VERSION?m=text" "${temp}/GOLANG_VERSION"
+		latest=$(cat "${temp}/GOLANG_VERSION")
+
+		if [ -z "${latest:-}" ]; then
+			print-fail "install-golang: latest version could not be detected; please try again later"
+			man install-golang | cat 1>&2
+			return 1
+		fi
+
+		if [ -z "${architecture:-}" ]; then
+			architecture=$(uname -m)
+		fi
+
+		architecture=$(printf '%s' "${architecture}" | tr '[:upper:]' '[:lower:]')
+
+		if [ "${architecture}" = "x86_64" ]; then
+			architecture="amd64"
+		elif [ "${architecture}" = "aarch64" ]; then
+			architecture="arm64"
+		fi
+
+		platform=$(uname | tr '[:upper:]' '[:lower:]')
+
+		print-success "install-golang: downloading golang v${latest}..."
+		download-safe "https://golang.org/dl/${latest}.${platform}-${architecture}.tar.gz" "${temp}"/go.tar.gz
+
+		if [ ! -d "${GOROOT}" ]; then
+			mkdir -p "${GOROOT}"
+		fi
+
+		if ! [ -d "${GOBIN}" ]; then
+			mkdir -p "${GOBIN}"
+		fi
+
+		tar --extract \
+			--gzip \
+			--strip-components=1 \
+			--file="${temp}"/go.tar.gz \
+			--directory="${GOROOT}"
+
+		ln -fs "${GOROOT}"/bin/* "${NUMONIC_BIN}"
+
+		. import-userenv
+		userenv set GOROOT="${GOROOT}"
+		userenv set GOPATH="${GOPATH}"
+		userenv set GOBIN="${GOBIN}"
+		userenv prepend-path "${GOROOT}/bin"
+		userenv prepend-path "${GOBIN}"
+
+		if [ -n "${version:-}" ]; then
+			print-success "install-golang: installing golang v${version}..."
+			go install golang.org/dl/go"${version}"@latest
+		fi
+	)
+
+	print-warn "$(cat <<-'EOT'
+		install-golang: start a new shell to enable tab completion...
+		exec $SHELL -l
+	EOT
+	)"
+}
+
+__numonic_install_golang "$@"

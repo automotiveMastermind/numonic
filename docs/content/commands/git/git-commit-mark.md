@@ -1,0 +1,51 @@
+---
+title: git-commit-mark
+---
+
+# NAME
+
+git-commit-mark - create a new empty marker commit
+
+# SYNOPSIS
+
+**git** **commit-mark** \<message\> [**-d** | **--debug**] [**-h** | **--help**]
+
+**git** **commit-mark** **-m** \<message\> [**-d** | **--debug**] [**-h** | **--help**]
+
+**git** **commit-mark** **--message=**\<message\> [**-d** | **--debug**] [**-h** | **--help**]
+
+# DESCRIPTION
+
+This command creates a new empty marker commit with a prefix of **\[MARK\]** for the subject. This is useful for marking
+the HEAD of a rebase to easily identify the target commit for a future squash. A marked commit is only retained locally.
+
+# OPTIONS
+
+## \<message\>, -m \<message\>, --message=\<message\>
+
+the message to include in the marker commit
+
+## -h, --help
+
+print this help information
+
+## -d, --debug
+
+print the commands as they are executed (set -x)
+
+# EXAMPLES
+
+## git commit-mark
+
+create an empty marker commit with a subject of: **\[MARK\]**
+
+## git commit-mark -d 'some message'
+
+## git commit-mark --debug 'some message'
+
+create an empty marker commit with a subject of: **\[MARK\] some message** while printing the commands as they are
+executed
+
+# SEE ALSO
+
+**git-commit-save**(1), **git-commit-wip**(1), **git-commit-restore**(1), **git-commit-undo**(1), **git-commit**(1)

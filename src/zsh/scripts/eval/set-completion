@@ -1,0 +1,20 @@
+#! /usr/bin/env zsh
+
+# use case sensitive match followed by case-insensitive match
+zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}'
+
+if command -v kubectl 1>/dev/null 2>&1; then
+	. <(kubectl completion zsh)
+fi
+
+if command -v helm 1>/dev/null 2>&1; then
+	. <(helm completion zsh)
+fi
+
+if command -v npm 1>/dev/null 2>&1; then
+	. <(npm completion)
+fi
+
+if command -v terraform 1>/dev/null 2>&1; then
+	complete -o nospace -C "$(command -v terraform)" terraform
+fi

@@ -1,0 +1,16 @@
+#! /usr/bin/env sh
+
+set -e
+
+__numonic_reverse() {
+	reversed=
+
+	# shellcheck disable=SC2068
+	for value in $@; do
+		reversed="${value} ${reversed}"
+	done
+
+	printf '%s' "${reversed%*' '}"
+}
+
+__numonic_reverse "$@"

@@ -1,0 +1,30 @@
+.TH "USERENV-LOAD" "1" "November 10, 2021" "Numonic v8.1.0" "Numonic
+Manual"
+.nh \" Turn off hyphenation by default.
+.SH NAME
+.PP
+userenv-load - loads the user specific environment file within the
+current shell session
+.SH SYNOPSIS
+.PP
+\f[B]userenv-load\f[R] [\f[B]--help\f[R]]
+.SH DESCRIPTION
+.PP
+This command will load all variables from the user specific environment
+file, typically localled at $HOME/.pam_environment.
+Once loaded, the variables will be available within the current shell.
+.SH OPTIONS
+.SS --help
+.PP
+print this help information
+.SH EXAMPLES
+.SS userenv load
+.PP
+load all variables contained within the user specific environment file
+.SH SEE ALSO
+.PP
+\f[B]userenv-edit\f[R](1), \f[B]userenv-set\f[R](1),
+\f[B]userenv-add\f[R](1), \f[B]userenv-replace\f[R](1),
+\f[B]pam_env\f[R](7)
+.SH AUTHORS
+Deavon M. McCaffery

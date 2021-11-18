@@ -1,0 +1,53 @@
+.TH "EDIT-BASHRC" "1" "November 10, 2021" "Numonic v8.1.0" "Numonic
+Manual"
+.nh \" Turn off hyphenation by default.
+.SH NAME
+.PP
+edit-bashrc - opens an editor to the user-specific bash startup script
+.SH SYNOPSIS
+.PP
+\f[B]edit-bashrc\f[R] [\f[B]-d\f[R] | \f[B]--debug\f[R]] [\f[B]-h\f[R] |
+\f[B]--help\f[R]]
+.SH DESCRIPTION
+.PP
+This command will open the editor defined by the \f[B]EDITOR\f[R]
+environment variable.
+If the variable is not set then the default editor will be \f[B]vi\f[R].
+Note that numonic will detect whether or not Visual Studio Code is
+available on the current PATH and will set this to the default editor if
+not otherwise set in the user environment (\f[B]userenv\f[R]).
+.PP
+The user-specific bash startup script is located at:
+.PP
+$HOME/.local/share/bashrc
+.PP
+If the file does not exist, it will be created with the correct shebang
+for bash.
+.PP
+For simple environment variables, we highly recommend using the
+\f[B]userenv\f[R] commands, which will make environment variables
+available across different shells (both bash and zsh) and supports
+directory-specific variables as well.
+.SH OPTIONS
+.SS FLAGS
+.SS -d, --debug
+.PP
+print the commands as they are executed (set -x)
+.SS -h, --help
+.PP
+print this help information
+.SH EXAMPLES
+.SS edit-bashrc
+.PP
+open the default editor to the user-specific bash startup script
+.SS edit-bashrc --debug
+.PP
+open the default editor to the user-specific bash startup script while
+printing the commands as they are executed
+.SH SEE ALSO
+.PP
+\f[B]userenv\f[R](1) (https://automotivemastermind.github.io/numonic/userenv/),
+\f[B]bash\f[R](1) (https://man7.org/linux/man-pages/man1/bash.1.html),
+\f[B]editor\f[R](1)
+.SH AUTHORS
+Deavon M. McCaffery

@@ -1,0 +1,5 @@
+# these can be safely removed; they are here in case they are useful for setting other variables
+NUMONIC_LOCAL="${HOME}/.local"
+NUMONIC_HOME="${NUMONIC_LOCAL}/numonic"
+NUMONIC_SHARE="${NUMONIC_LOCAL}/share"
+NUMONIC_BIN="${NUMONIC_LOCAL}/bin"

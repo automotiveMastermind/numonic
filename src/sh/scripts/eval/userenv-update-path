@@ -1,0 +1,96 @@
+#! /usr/bin/env sh
+
+__numonic_userenv_update_path() {
+	__userenv_file="${HOME}"/.pam_environment
+
+	while :; do
+		case $1 in
+			-h|--help)
+				man userenv-add
+				return 0
+				;;
+			-f|--file)
+				__userenv_file="${2}"
+				shift
+				;;
+			--file=*)
+				__userenv_file="${1#*=}"
+				;;
+			*?)
+				print-fail "userenv update-path: too many arguments, argument: ${1} is unexpected"
+				man userenv-append | cat 1>&2
+				return 1
+				;;
+			*)
+				break
+				;;
+		esac
+		shift
+	done
+
+	AZURE_CLI_PATH=${AZURE_CLI_PATH:-${NUMONIC_SHARE}/azure}
+	AZURE_CLI_BIN=${AZURE_CLI_BIN:-${AZURE_CLI_PATH}/bin}
+
+	if [ -d "${AZURE_CLI_BIN}" ]; then
+		userenv set AZURE_CLI_PATH="${AZURE_CLI_PATH}" --file="${__userenv_file}"
+		userenv prepend-path "${AZURE_CLI_BIN}" --file="${__userenv_file}"
+	else
+		print-warn "userenv update-path: azure-cli not found at: ${AZURE_CLI_BIN}"
+	fi
+
+	DOTNET_PATH=${DOTNET_PATH:-${NUMONIC_SHARE}/dotnet}
+
+	if [ -d "${DOTNET_PATH}" ]; then
+		userenv set DOTNET_PATH="${DOTNET_PATH}" --file="${__userenv_file}"
+		userenv prepend-path "${DOTNET_PATH}" --file="${__userenv_file}"
+	else
+		print-warn "userenv update-path: dotnet not found at: ${DOTNET_PATH}"
+	fi
+
+	DOTNET_TOOLS_PATH=${DOTNET_TOOLS_PATH:-${DOTNET_PATH}/tools}
+
+	if [ -d "${DOTNET_TOOLS_PATH}" ]; then
+		userenv set DOTNET_TOOLS_PATH="${DOTNET_TOOLS_PATH}" --file="${__userenv_file}"
+		userenv prepend-path "${DOTNET_TOOLS_PATH}" --file="${__userenv_file}"
+	else
+		print-warn "userenv update-path: dotnet tools not found at: ${DOTNET_TOOLS_PATH}"
+	fi
+
+	DOTNET_TOOLS_PATH=${DOTNET_TOOLS_PATH:-${HOME}/.dotnet/tools}
+
+	if [ -d "${DOTNET_TOOLS_PATH}" ]; then
+		userenv set DOTNET_TOOLS_PATH="${DOTNET_TOOLS_PATH}" --file="${__userenv_file}"
+		userenv prepend-path "${DOTNET_TOOLS_PATH}" --file="${__userenv_file}"
+	else
+		print-warn "userenv update-path: dotnet tools not found at: ${DOTNET_TOOLS_PATH}"
+	fi
+
+	GOOGLE_CLOUD_SDK_PATH=${GOOGLE_CLOUD_SDK_PATH:-${NUMONIC_SHARE}/gcloud}
+	GOOGLE_CLOUD_SDK_BIN=${GOOGLE_CLOUD_SDK_BIN:-${GOOGLE_CLOUD_SDK_PATH}/bin}
+
+	if [ -d "${GOOGLE_CLOUD_SDK_BIN}" ]; then
+		userenv set GOOGLE_CLOUD_SDK_PATH="${GOOGLE_CLOUD_SDK_PATH}" --file="${__userenv_file}"
+		userenv prepend-path "${GOOGLE_CLOUD_SDK_BIN}" --file="${__userenv_file}"
+	else
+		print-warn "userenv update-path: google cloud sdk not found at: ${GOOGLE_CLOUD_SDK_BIN}"
+	fi
+
+	GOROOT="${GOROOT:-${NUMONIC_SHARE}/go}"
+	GOPATH="${GOPATH:-${HOME}/go}"
+	GOBIN="${GOBIN:-${GOPATH}/bin}"
+
+	if [ -d "${GOROOT}" ]; then
+
+		if [ ! -d "${GOBIN}" ]; then
+			mkdir -p "${GOBIN}" 1>/dev/null
+		fi
+
+		userenv set GOROOT="${GOROOT}" --file="${__userenv_file}"
+		userenv set GOPATH="${GOPATH}" --file="${__userenv_file}"
+		userenv set GOBIN="${GOBIN}" --file="${__userenv_file}"
+		userenv prepend-path "${GOROOT}/bin" --file="${__userenv_file}"
+		userenv prepend-path "${GOBIN}" --file="${__userenv_file}"
+	else
+		print-warn "userenv update-path: goroot not found at: ${GOROOT_BIN}"
+	fi
+}

@@ -1,0 +1,99 @@
+#! /usr/bin/env sh
+
+set -e
+
+__numonic_git_pull_request() {
+	branch=
+	remote=
+
+	while :; do
+		case $1 in
+			--help)
+				man git-pull-request
+				return 0
+				;;
+			-dr|--dry-run)
+				dry_run=1
+				;;
+			--debug)
+				debug=1
+				;;
+			--branch)
+				branch="${2}"
+				shift
+				;;
+			--branch=*)
+				branch="${1#*=}"
+				;;
+			--remote)
+				remote="${2}"
+				shift
+				;;
+			--remote=*)
+				remote="${1#*=}"
+				;;
+			?*)
+				if [ -z "${branch:-}" ]; then
+					branch="${1}"
+				elif [ -z "${remote:-}" ]; then
+					remote="${1}"
+				else
+					print-fail "git pull-request: too many arguments, argument: ${1} is unexpected"
+					man git-pull-request | cat 1>&2
+					return 1
+				fi
+				;;
+			*)
+				break
+				;;
+		esac
+		shift
+	done
+
+	if [ -z "${branch:-}" ]; then
+		branch="next"
+	fi
+
+	if [ -z "${remote:-}" ]; then
+		remote="upstream"
+	fi
+
+	for current in "${branch}" develop next main master; do
+		if git show-ref --quiet --verify "refs/heads/${current}"; then
+			branch="${current}"
+			break
+		fi
+	done
+
+	print-warn '' \
+		'GIT PULL REQUEST' \
+		"rebase: ${remote}/${branch}" \
+	''
+
+	if [ -n "${dry_run:-}" ]; then
+		return 0
+	fi
+
+	(
+		if [ -n "${debug:-}" ]; then
+			set -x
+		fi
+
+		# fetch all upstreams
+		git fetch --all
+
+		# rebase interactively with the remote
+		git rebase --interactive --autosquash --autostash "${remote}"/"${branch}" --empty=drop --signoff || true
+
+		# add all files recursively
+		git add --all
+
+		# recursive clean and ignore gitignore (since all files will be tracked)
+		git clean -xd --force
+
+		# create the commit
+		git commit --edit --signoff
+	)
+}
+
+__numonic_git_pull_request "$@"

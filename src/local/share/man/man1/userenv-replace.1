@@ -1,0 +1,51 @@
+.TH "USERENV-REPLACE" "1" "November 10, 2021" "Numonic v8.1.0" "Numonic
+Manual"
+.nh \" Turn off hyphenation by default.
+.SH NAME
+.PP
+userenv-replace - replaces the value of an existing variable within the
+user specific environment file
+.SH SYNOPSIS
+.PP
+\f[B]userenv replace\f[R] <\f[I]key\f[R]> <\f[I]value\f[R]>
+[\f[B]-h\f[R] | \f[B]--help\f[R]]
+.PP
+\f[B]userenv replace\f[R] <\f[I]key\f[R]>\f[B]=\f[R]<\f[I]value\f[R]>
+[\f[B]-h\f[R] | \f[B]--help\f[R]]
+.SS DESCRIPTION
+.PP
+This command replaces the value of an exsting value within the user
+specific environment file, typically located at $HOME/.pam_environment.
+If the variable does not already exist, then the command will fail.
+To set or add an existing variable whther or not it already exists, use
+\f[B]userenv set\f[R].
+To set a value if and only if it does not already exist, use
+\f[B]userenv add\f[R].
+.PP
+Once the new variable is replaces, the environment will be loaded to
+ensure that the new variable is available within the current shell
+session.
+.SH OPTIONS
+.SS <key>
+.PP
+the key (or name) of the environment variable to add
+.SS <value>
+.PP
+the value of the environment variable to add
+.SS -h, --help
+.PP
+print this help information
+.SH EXAMPLES
+.SS userenv replace abc 123
+.PP
+replace a variable named abc with a value of 123
+.SS userenv replace abc=123
+.PP
+replace a variable named abc with a value of 123
+.SH SEE ALSO
+.PP
+\f[B]userenv-edit\f[R](1),
+\f[B]userenv-set\f[R](1),\f[B]userenv-add\f[R](1),
+\f[B]userenv-load\f[R](1), \f[B]pam_env\f[R](7)
+.SH AUTHORS
+Deavon M. McCaffery

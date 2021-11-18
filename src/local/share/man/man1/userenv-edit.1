@@ -1,0 +1,42 @@
+.TH "USERENV-EDIT" "1" "November 10, 2021" "Numonic v8.1.0" "Numonic
+Manual"
+.nh \" Turn off hyphenation by default.
+.SH NAME
+.PP
+userenv-edit - opens an editor to the user specific environments file
+.SH SYNOPSIS
+.PP
+\f[B]userenv edit\f[R] [\f[B]-f\f[R] <\f[I]file\f[R]>] [\f[B]-h\f[R] |
+\f[B]--help\f[R]]
+.PP
+\f[B]userenv edit\f[R] [\f[B]--file=\f[R]<\f[I]file\f[R]>] [\f[B]-h\f[R]
+| \f[B]--help\f[R]]
+.SH DESCRIPTION
+.PP
+This command will open an editor for the user specific environments
+file, typically located at $HOME/.pam_environment and wait for any
+changes to be saved.
+Once the editor is closed, the environment will be loaded.
+.SH OPTIONS
+.SS -f <file>, --file=<file>
+.PP
+the path of the environment file to read and write DEFAULT:
+$HOME/.pam_environment
+.SS -h, --help
+.PP
+print this help information
+.SH EXAMPLES
+.SS userenv edit
+.PP
+opens an editor to the user specific environments file
+.SS userenv edit -f \[ti]/my-variables
+.SS userenv edit --file=\[ti]/my-variables
+.PP
+opens an editor to the specified user specific environments file
+.SH SEE ALSO
+.PP
+\f[B]userenv-set\f[R](1), \f[B]userenv-add\f[R](1),
+\f[B]userenv-replace\f[R](1), \f[B]userenv-load\f[R](1),
+\f[B]pam_env\f[R](7)
+.SH AUTHORS
+Deavon M. McCaffery

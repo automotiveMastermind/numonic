@@ -1,0 +1,82 @@
+.TH "USERENV-APPEND" "1" "November 10, 2021" "Numonic v8.1.0" "Numonic
+Manual"
+.nh \" Turn off hyphenation by default.
+.SH NAME
+.PP
+userenv-append - appends a value to the end of a variable within the
+user specific environment file
+.SH SYNOPSIS
+.PP
+\f[B]userenv append\f[R] <\f[I]key\f[R]> <\f[I]value\f[R]> [\f[B]-s\f[R]
+<\f[I]separator\f[R]>] [\f[B]-f\f[R] <\f[I]file\f[R]>] [\f[B]-h\f[R] |
+\f[B]--help\f[R]]
+.PP
+\f[B]userenv append\f[R] <\f[I]key\f[R]>\f[B]=\f[R]<\f[I]value\f[R]>
+[\f[B]--separator=\f[R]<\f[I]separator\f[R]>]
+[\f[B]--file=\f[R]<\f[I]file\f[R]>] [\f[B]-h\f[R] | \f[B]--help\f[R]]
+.SH DESCRIPTION
+.PP
+This command will append the specified value to the end of a variable
+within the user specific environment file, typically located at
+$HOME/.pam_environment.
+If the variable does not already exist, it will be created using the
+specified value.
+An optional separator can be defined.
+If the separator is not defined, then the value will be separated using
+a colon (:).
+.PP
+If the specified value already exists within the variable, the command
+will fail with an exit code of 2.
+All other errors will return an exit code of 1.
+.PP
+Once the change has been made, it should be available within the current
+shell.
+.SH OPTIONS
+.SS <key>
+.PP
+the key (or name) of the environment variable to append
+.SS <value>
+.PP
+the value of the environment variable to append
+.SS -s <separator>, --separator=<separator>
+.PP
+the separator to use when appending the value
+.SS -f <file>, --file=<file>
+.PP
+the path of the environment file to read and write DEFAULT:
+$HOME/.pam_environment
+.SS -h, --help
+.PP
+print this help information
+.SH DEFAULTS
+.PP
+If the separator is not specified, the default will be the colon (:)
+character.
+For example if a value of 123 is appended to an existing variable called
+my_var with a value of abc, then the result will be: my_var=abc:123 by
+default.
+.PP
+If no file is specified, then the default user specific environment file
+location of $HOME/.pam_environment will be used.
+.SH EXAMPLES
+.SS userenv append abc 123
+.SS userenv append abc=123
+.PP
+append a variable named abc with a value of 123 using the default colon
+as a separator
+.SS userenv append abc 123 -s \[aq],\[aq]
+.SS userenv append abc=123 --separator=\[aq],\[aq]
+.PP
+append a variable named abc with the value of 123 using a comma as a
+separator
+.SS userenv append abc 123 -f \[ti]/my-variables
+.SS userenv append abc=123 --file=\[ti]/my-variables
+.PP
+append a variable named abc with a value of 123 from the specified file
+($HOME/my-variables) using the default colon as a separator
+.SH SEE ALSO
+.PP
+\f[B]userenv-prepend\f[R](1), \f[B]userenv-load\f[R](1),
+\f[B]pam_env\f[R](7)
+.SH AUTHORS
+Deavon M. McCaffery

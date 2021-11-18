@@ -1,0 +1,41 @@
+#! /usr/bin/env sh
+
+set -e
+
+# source the os release
+VERSION_ID=$(. /etc/os-release && printf '%s' "${VERSION_ID}")
+
+# get the major version
+MAJOR_VERSION=${VERSION_ID%.*}
+
+print-success 'installing dotnet prerequisites...'
+
+sudo apt update --yes
+
+case "${MAJOR_VERSION}" in
+"9")
+sudo apt install --yes --no-install-recommends \
+	ca-certificates \
+	\
+	libc6 \
+	libgcc1 \
+	libgssapi-krb5-2 \
+	libicu57 \
+	liblttng-ust0 \
+	libssl1.0.2 \
+	libstdc++6 \
+	zlib1g
+;;
+"10")
+sudo apt install --yes --no-install-recommends \
+	ca-certificates \
+	\
+	libc6 \
+	libgcc1 \
+	libgssapi-krb5-2 \
+	libicu63 \
+	libssl1.1 \
+	libstdc++6 \
+	zlib1g
+;;
+esac

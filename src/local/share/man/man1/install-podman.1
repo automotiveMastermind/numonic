@@ -1,0 +1,61 @@
+.TH "INSTALL-PODMAN" "1" "November 10, 2021" "Numonic v8.1.0" "Numonic
+Manual"
+.nh \" Turn off hyphenation by default.
+.SH NAME
+.PP
+install-podman - installs podman, skopeo, and all prerequisites for the
+current platform required to build and run containers
+.SH SYNOPSIS
+.PP
+\f[B]install-podman\f[R] [\f[B]-d\f[R] | \f[B]--debug\f[R]]
+[\f[B]-f\f[R] | \f[B]--force\f[R]] [\f[B]-h\f[R] | \f[B]--help\f[R]]
+[\f[B]-q\f[R] | \f[B]--quiet\f[R]]
+.SH DESCRIPTION
+.PP
+This installer will configure podman and a container runtime with full
+support for bind mounts, port-forwarding, and cross-platform build /
+run.
+The exact dependencies and configuration of podman is highly dependent
+on the platform on which it is installed.
+See the following sections for more information.
+.SS MACOS
+.PP
+Installation of podman on macOS currently relies on
+lima (https://github.com/lima-vm/lima) to enable bind mount capabilities
+using sshfs.
+The default \f[C]podman-machine\f[R] does not currently support bind
+mounts, although support is coming soon.
+We will continue to evaluate \f[C]podman-machine\f[R] as a native
+solution.
+.SS WSL
+.PP
+WSL 2 does not currently support systemd, so the podman socket is
+initialised as a background process.
+In addition, the cgroup manager must be set to cgroupfs and the events
+logger is set to file.
+.SH OPTIONS
+.SS FLAGS
+.SS -d, --debug
+.PP
+print the commands as they are executed (set -x)
+.SS -f, --force
+.PP
+forces an installation / upgrade of podman and its dependencies even if
+it is already installed
+.SS -h, --help
+.PP
+print this help information
+.SS -q, --quiet
+.PP
+suppress any output to stdout (any errors will still be printed)
+.SH EXAMPLES
+.SS install-podman
+.PP
+installs podman if not already installed
+.SS install-podman --force
+.PP
+installs or updates podman even if it is already installed this will
+replace any existing dependencies, such as vms used to enable podman
+support on platforms such as macOS
+.SH AUTHORS
+Deavon M. McCaffery; Not Committed Yet

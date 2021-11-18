@@ -1,0 +1,9 @@
+#! /usr/bin/env zsh
+
+if [ -f "${HOME}"/.local/numonic/sh/profile ]; then
+	. "${HOME}"/.local/numonic/sh/profile
+fi
+
+if [ -f "${HOME}"/.local/numonic/sh/zprofile ]; then
+	. "${HOME}"/.local/numonic/zsh/zprofile
+fi

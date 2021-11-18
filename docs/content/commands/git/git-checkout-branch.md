@@ -1,0 +1,107 @@
+---
+title: git-checkout-branch
+---
+
+# NAME
+
+git-checkout-branch - create a new branch with the specified name and tracks the branch in the origin
+
+# SYNOPSIS
+
+**git** **checkout-branch** <*branch*> [<*remote*>] [<*start-point*>] [**-d** | **--debug**] [**-dr** | **--dry-run**] [**-h** | **--help**] [**-q** | **--quiet**]
+
+**git** **checkout-branch** **-b** <*branch*> [**-r** <*remote*>] [**-sp** <*start-point*>]
+
+**git** **checkout-branch** **--branch=**<*branch*> [**--remote=**<*remote*>] [**--start-point=**<*start-point*>]
+
+# DESCRIPTION
+
+This command creates a new branch with the specified **branch** name. The newly created branch will then be pushed
+to the specified **remote**, which is **origin** by default. A **start-point** can also be supplied that can be used
+as the **HEAD** for the newly created branch. If a **start-point** is not supplied, then the **HEAD** of the current
+working tree will be used instead.
+
+If there are any untracked changes on the current working tree, they will be moved to the new branch.
+
+This is essentially equivelant to the following git commands:
+
+```sh
+git pull
+git checkout --recurse-submodules -b \<branch\> \<start-point\>
+git push --set-upstream \<remote\> \<branch\>
+```
+
+# OPTIONS
+
+## ARGUMENTS
+
+### \<branch\>, -b \<branch\>, --branch=\<branch\>
+
+name of the branch to create
+
+### \<remote\>, -r \<remote\>, --remote=\<remote\>
+
+name of the remote where the resulting branch should be tracked
+
+### \<start-point\>, -sp \<start-point\>, --start-point=\<start-point\>
+
+name of a commit at which to start the new branch; see **git-branch**(1) for details. Defaults to **HEAD**
+
+As a special case, you may use **"A...B"** as a shortcut for the merge base of **A** and **B** if their is exactly
+one merge base. You can leave out at most one of **A** and **B**, in which case it defaults to **HEAD**.
+
+## FLAGS
+
+### -d, --debug
+
+print the commands as they are executed (set -x)
+
+### -dr, --dry-run
+
+print the branch, remote, and start point without creating the actual branch
+
+### -h, --help
+
+print this help information
+
+### -q, --quiet
+
+suppress any output to stdout (any errors will still be printed)
+
+# EXAMPLES
+
+## git checkout-branch feat/something-new
+
+## git checkout-branch -b feat/something-new
+
+## git checkout-branch --branch=feat/something-new
+
+create a new branch tracked by the **origin** called **feat/something-new** using the **HEAD** of the current branch
+
+## git checkout-branch feat/something-new upstream
+
+## git checkout-branch -b feat/something-new -r upstream
+
+## git checkout-branch --branch=feat/something-new --remote=upstream
+
+create a new branch tracked by the **upstream** called **feat/something-new** using the **HEAD** of the current branch
+
+## git checkout-branch feat/something-new upstream HEAD~1
+
+## git checkout-branch -b feat/something-new -r upstream -sp HEAD~1
+
+## git checkout-branch --branch=feat/something-new --remote=upstream --start-point=HEAD~1
+
+create a new branch tracked by the **upstream** called **feat/something-new** using the previous commit of **HEAD** of
+the current branch
+
+## git checkout-branch --branch feat/something-new --start-point HEAD~1
+
+## git checkout-branch --branch=feat/something-new --start-point=HEAD~1
+
+create a new branch tracked by the **origin** called **feat/something-new** using the previous commit of **HEAD** of
+the current branch
+
+# SEE ALSO
+
+**git-checkout**(1), **git-switch**(1), **git-push**(1)
