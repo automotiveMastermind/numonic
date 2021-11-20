@@ -35,6 +35,11 @@ fi
 # make sure the font dir exists
 mkdir -p "${font_dir}" 1>/dev/null
 
+# ensure unzip exists
+if ! command -v unzip >/dev/null 2>&1; then
+	sudo apt install -y unzip
+fi
+
 # extract fira code
 unzip "${temp_dir}"/FiraCode.zip 'Fira*Windows*.ttf' -d "${font_dir}" 1>/dev/null
 
