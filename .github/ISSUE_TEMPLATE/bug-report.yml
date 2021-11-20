@@ -1,6 +1,6 @@
 name: Bug Report
 description: Report a bug when using numonic.
-title: "feat(shell): "
+title: "fix(shell): "
 labels: ["needs triage", "bug"]
 assignees:
   - numonic-maintainers
