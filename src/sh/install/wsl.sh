@@ -48,7 +48,11 @@ if [ ! -f "/etc/wsl.conf" ]; then
 		[automount]
 		enabled = true
 		options = "metadata"
-	EOT
+
+		[interop]
+		enabled = true
+		appendWindowsPath = false
+		EOT
 fi
 
 # determine if ssh remoting is configured
