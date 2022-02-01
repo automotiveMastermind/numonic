@@ -90,6 +90,7 @@ only validate against a few of the more recent versions of popular ones.
 | fedora  | 34 and 35                           |
 | debian  | 10 (Buster) and 11 (Bullseye)       |
 | centos  | 8                                   |
+| arch    | 2021.11.01 and higher               |
 | amazon  | Amazon Linux 2                      |
 
 
