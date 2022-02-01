@@ -11,7 +11,6 @@ concurrency:
 # the end-to-end pipeline only requires permissions to read the contents of the repo and its associated metadata
 permissions:
   contents: read
-  metadata: read
 
 jobs:
   # lint - run shellcheck across all shell scripts
