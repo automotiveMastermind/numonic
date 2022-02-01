@@ -4,7 +4,7 @@ set -e
 
 __numonic_install_debian() {
 	sudo_cmd=$(command -v sudo || printf '')
-	packages="git gnupg jq"
+	packages="git gnupg jq unzip"
 
 	print-success "debian: updating software repositories..."
 	"${sudo_cmd}" apt update --yes
