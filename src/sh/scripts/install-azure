@@ -16,7 +16,7 @@ __numonic_install_azure() {
 				;;
 			-f|--force)
 				if [ -d "${install_dir}" ]; then
-					rm --recursive --force "${install_dir}"
+					rm -rf "${install_dir}"
 				fi
 
 				if command -v az 1>/dev/null 2>&1; then
