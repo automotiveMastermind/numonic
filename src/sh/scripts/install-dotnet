@@ -33,11 +33,11 @@ __numonic_install_dotnet() {
 				;;
 			-f|--force)
 				if [ -d "${install_dir}" ]; then
-					rm --recursive --force "${install_dir}"
+					rm -rf "${install_dir}"
 				fi
 
 				if [ -d "${HOME}/dotnet" ]; then
-					rm --recursive --force "${HOME}/dotnet"
+					rm -rf "${HOME}/dotnet"
 				fi
 
 				if command -v dotnet 1>/dev/null 2>&1; then
