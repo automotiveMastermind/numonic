@@ -1,3 +1,15 @@
+# [1.1.0](https://github.com/automotiveMastermind/numonic/compare/v1.0.1...v1.1.0) (2022-09-16)
+
+
+### Bug Fixes
+
+* **wsl:** ensure unzip is avalable when installing ([06e524e](https://github.com/automotiveMastermind/numonic/commit/06e524ea31b495c8ca88f7585a65ccd611291d29))
+
+
+### Features
+
+* **os:** add arch linux support ([615a771](https://github.com/automotiveMastermind/numonic/commit/615a771f0906631e7020530e4a22e926dee38bf5))
+
 ## [1.0.1](https://github.com/automotiveMastermind/numonic/compare/v1.0.0...v1.0.1) (2022-09-16)
 
 
