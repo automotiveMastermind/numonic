@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/automotiveMastermind/numonic/compare/v1.0.0...v1.0.1) (2022-09-16)
+
+
+### Bug Fixes
+
+* **wsl:** remove appending windows path to wsl path ([3e2fabe](https://github.com/automotiveMastermind/numonic/commit/3e2fabef28fcfd506a341fa5f001d02dfe853c00))
+
 # 1.0.0 (2021-11-18)
 
 
